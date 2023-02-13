@@ -1,0 +1,37 @@
+{
+    "preset": "laravel",
+    "cache-file": ".pint.result.cache",
+    "rules": {
+        "phpdoc_align": {
+            "align": "left"
+        },
+        "phpdoc_order": true,
+        "array_syntax": {
+            "syntax": "short"
+        },
+        "concat_space": {
+            "spacing": "one"
+        },
+        "phpdoc_no_empty_return": false,
+        "no_superfluous_phpdoc_tags": false,
+        "no_whitespace_in_blank_line": true,
+        "no_extra_blank_lines": {
+            "tokens": [
+                "attribute",
+                "case",
+                "continue",
+                "curly_brace_block",
+                "default",
+                "extra",
+                "parenthesis_brace_block",
+                "square_brace_block",
+                "switch",
+                "throw",
+                "use"
+            ]
+        },
+        "class_definition": {
+            "inline_constructor_arguments": false
+        }
+    }
+}

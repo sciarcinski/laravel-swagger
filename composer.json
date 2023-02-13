@@ -1,0 +1,25 @@
+{
+    "name": "sciarcinski/laravel-swagger",
+    "description": "OpenApi or Swagger integration to Laravel",
+    "keywords": ["laravel", "swagger", "documentation", "api", "OpenApi", "API"],
+    "autoload": {
+        "psr-4": {
+            "Sciarcinski\\LaravelSwagger\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sławomir Ciarciński",
+            "email": "slawgos@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "laravel/framework": "^9.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.4",
+        "mockery/mockery": "^1.4.4",
+        "phpunit/phpunit": "^9.5.10"
+    }
+}
