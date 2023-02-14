@@ -9,14 +9,10 @@ use Illuminate\Support\Str;
 
 class DocumentationCreator
 {
+    use Pathable;
+
     /** @var Router */
     protected Router $router;
-
-    /** @var string */
-    protected string $doc = 'api';
-
-    /** @var string */
-    protected string $routeName;
 
     /**
      * @param Router $router
@@ -27,34 +23,12 @@ class DocumentationCreator
     }
 
     /**
-     * @param string $documentation
-     * @return $this
-     */
-    public function setDoc(string $documentation): static
-    {
-        $this->doc = $documentation;
-
-        return $this;
-    }
-
-    /**
-     * @param string $routeName
-     * @return $this
-     */
-    public function setRouteName(string $routeName): static
-    {
-        $this->routeName = $routeName;
-
-        return $this;
-    }
-
-    /**
      * @param bool $routeResource
      * @return array
      */
-    public function create(bool $routeResource = false): array
+    public function create(string $routeName, bool $routeResource = false): array
     {
-        $routes = $routeResource ? $this->prepareResourceName() : [$this->routeName];
+        $routes = $routeResource ? $this->prepareResourceName($routeName) : [$routeName];
 
         foreach ($routes as $route) {
             $this->createFiles($route);
@@ -64,19 +38,20 @@ class DocumentationCreator
     }
 
     /**
+     * @param string $docName
      * @param string $routeName
      * @return array
      */
     protected function createFiles(string $routeName): array
     {
-        /** @var Route $route */
+        /** @var \Illuminate\Routing\Route $route */
         $route = $this->router->getRoutes()->getByName($routeName);
 
         $fileName = Str::replace('.', '_', $routeName);
         $fileName = Str::slug($fileName, '_');
 
-        $filePathConfig = config('documentation.documentations.' . $this->doc . '.paths.configs') . $fileName . '.json';
-        $filePathResponses = config('documentation.documentations.' . $this->doc . '.paths.responses') . $fileName . '.json';
+        $filePathConfig = $this->getPathConfig() . $fileName . '.json';
+        $filePathResponses = $this->getPathResponses() . $fileName . '.json';
 
         $files = [];
 
@@ -175,14 +150,15 @@ class DocumentationCreator
     }
 
     /**
+     * @param string $routeName
      * @return array
      */
-    protected function prepareResourceName(): array
+    protected function prepareResourceName(string $routeName): array
     {
         $routes = [];
 
         foreach (['index', 'show', 'store', 'update', 'destroy'] as $item) {
-            $route = $this->routeName . '.' . $item;
+            $route = $routeName . '.' . $item;
 
             if ($this->router->getRoutes()->hasNamedRoute($route)) {
                 $routes[] = $route;
