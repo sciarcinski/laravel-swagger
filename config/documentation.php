@@ -9,7 +9,7 @@
  */
 return [
     'documentations' => [
-        [
+        'api' => [
             'title' => 'API',
             'security' => 'auto',
             'paths' => [
