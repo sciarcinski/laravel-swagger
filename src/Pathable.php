@@ -2,6 +2,8 @@
 
 namespace Sciarcinski\LaravelSwagger;
 
+use Illuminate\Support\Str;
+
 trait Pathable
 {
     /** @var string */
@@ -32,5 +34,25 @@ trait Pathable
     public function getPathResponses(): string
     {
         return config('documentation.documentations.' . $this->docKey . '.paths.responses');
+    }
+
+    /**
+     * @return string
+     */
+    public function getPathComponents(): string
+    {
+        return config('documentation.documentations.' . $this->docKey . '.paths.components');
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public function transformFileName(string $name): string
+    {
+        $name = Str::replace('.', '_', $name);
+        $name = Str::slug($name, '_');
+
+        return $name;
     }
 }

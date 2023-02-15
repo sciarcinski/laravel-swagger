@@ -12,7 +12,10 @@ class ProcessRouter
     protected Route $route;
 
     /** @var array */
-    protected array $parameters = [];
+    protected array $rulesRequest = [];
+
+    /** @var array */
+    protected array $required = [];
 
     /**
      * @param string $route
@@ -26,11 +29,35 @@ class ProcessRouter
     }
 
     /**
+     * @return array
+     */
+    public function getRulesRequest(): array
+    {
+        return $this->rulesRequest;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequired(): array
+    {
+        return $this->required;
+    }
+
+    /**
      * @return string
      */
     public function getMethod(): string
     {
         return strtolower($this->route->methods()[0]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return '/' . $this->route->uri();
     }
 
     /**
@@ -43,15 +70,36 @@ class ProcessRouter
         $method = (new ReflectionClass($this->route->getController()))->getMethod($this->route->getActionMethod());
         $routeParameters = $method->getParameters();
 
-        $parameters = [];
-
         foreach ($routeParameters as $routeParameter) {
             $parameter = new ProcessParameter($routeParameter);
             $parameter->process();
 
-            $parameters[] = $parameter;
+            $this->addRequired($parameter->getRequired());
+            $this->addRulesRequest($parameter->getRulesRequest());
         }
 
         return $this;
+    }
+
+    /**
+     * @param array $items
+     * @return void
+     */
+    protected function addRequired(array $items): void
+    {
+        if (! empty($items)) {
+            $this->required = array_merge($this->required, $items);
+        }
+    }
+
+    /**
+     * @param array $items
+     * @return void
+     */
+    protected function addRulesRequest(array $items): void
+    {
+        if (! empty($items)) {
+            $this->rulesRequest = array_merge($this->rulesRequest, $items);
+        }
     }
 }

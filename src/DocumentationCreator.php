@@ -5,7 +5,6 @@ namespace Sciarcinski\LaravelSwagger;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class DocumentationCreator
 {
@@ -47,9 +46,7 @@ class DocumentationCreator
         /** @var \Illuminate\Routing\Route $route */
         $route = $this->router->getRoutes()->getByName($routeName);
 
-        $fileName = Str::replace('.', '_', $routeName);
-        $fileName = Str::slug($fileName, '_');
-
+        $fileName = $this->transformFileName($routeName);
         $filePathConfig = $this->getPathConfig() . $fileName . '.json';
         $filePathResponses = $this->getPathResponses() . $fileName . '.json';
 
@@ -85,7 +82,13 @@ class DocumentationCreator
      */
     protected function createFileConfig(string $path, Route $route): string
     {
-        $data = ['merge' => []];
+        $data = [
+            'tags' => [],
+            'summary' => $route->getName(),
+            'description' => null,
+            'operationId' => $route->getName(),
+            'merge' => [],
+        ];
 
         preg_match_all('/\{(.*?)\}/', $route->uri(), $parameters);
         $parameters = Arr::get($parameters, 1, []);
@@ -114,35 +117,46 @@ class DocumentationCreator
     {
         $data = [];
 
+        $success = [
+            'description' => '',
+            'content' => [
+                [
+                    'type' => 'application/json',
+                    //'schema' => null,
+                    'example' => [],
+                ],
+            ],
+        ];
+
         switch ($route->getActionMethod()) {
             case 'index':
-                $data['200'] = [];
-                $data['401'] = 'components/response_unauthorized.json';
+                $data['200'] = $success;
+                $data['401'] = '#components/response_unauthorized.json';
                 break;
 
             case 'show':
-                $data['200'] = [];
-                $data['401'] = 'components/response_unauthorized.json';
-                $data['404'] = 'components/response_model_not_found.json';
+                $data['200'] = $success;
+                $data['401'] = '#components/response_unauthorized.json';
+                $data['404'] = '#components/response_not_found_http.json';
                 break;
 
             case 'store':
-                $data['201'] = [];
-                $data['401'] = 'components/response_unauthorized.json';
-                $data['422'] = 'components/response_invalidation.json';
+                $data['201'] = $success;
+                $data['401'] = '#components/response_unauthorized.json';
+                $data['422'] = '#components/response_invalidation.json';
                 break;
 
             case 'update':
-                $data['200'] = [];
-                $data['401'] = 'components/response_unauthorized.json';
-                $data['404'] = 'components/response_model_not_found.json';
-                $data['422'] = 'components/response_invalidation.json';
+                $data['200'] = $success;
+                $data['401'] = '#components/response_unauthorized.json';
+                $data['404'] = '#components/response_not_found_http.json';
+                $data['422'] = '#components/response_invalidation.json';
                 break;
 
             case 'destroy':
-                $data['204'] = [];
-                $data['401'] = 'components/response_unauthorized.json';
-                $data['404'] = 'components/response_model_not_found.json';
+                $data['204'] = $success;
+                $data['401'] = '#components/response_unauthorized.json';
+                $data['404'] = '#components/response_not_found_http.json';
                 break;
         }
 

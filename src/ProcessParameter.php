@@ -12,9 +12,6 @@ class ProcessParameter
     protected ReflectionParameter $parameter;
 
     /** @var array */
-    protected array $rulesPath = [];
-
-    /** @var array */
     protected array $rulesRequest = [];
 
     /** @var array */
@@ -26,6 +23,22 @@ class ProcessParameter
     public function __construct(ReflectionParameter $parameter)
     {
         $this->parameter = $parameter;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRulesRequest(): array
+    {
+        return $this->rulesRequest;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequired(): array
+    {
+        return $this->required;
     }
 
     /**
