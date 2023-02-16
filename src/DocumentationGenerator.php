@@ -44,7 +44,7 @@ class DocumentationGenerator extends EventEmitter
             'components' => $components,
         ];
 
-        file_put_contents('/var/www/f24-api/docs/api/api.json', json_encode($doc, JSON_PRETTY_PRINT));
+        file_put_contents($this->getPathDocJson(), json_encode($doc, JSON_PRETTY_PRINT));
     }
 
     /**

@@ -45,6 +45,14 @@ trait Pathable
     }
 
     /**
+     * @return string
+     */
+    public function getPathDocJson(): string
+    {
+        return config('docs-swagger.documentations.' . $this->docKey . '.paths.doc_json');
+    }
+
+    /**
      * @param string $name
      * @return string
      */
