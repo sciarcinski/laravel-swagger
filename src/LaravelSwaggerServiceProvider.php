@@ -6,16 +6,22 @@ use Illuminate\Support\ServiceProvider;
 
 class LaravelSwaggerServiceProvider extends ServiceProvider
 {
-    public function boot()
+    /**
+     * @return void
+     */
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '../config/documentation.php' => config_path('documentation.php'),
+                __DIR__ . '../config/docs-swagger.php' => config_path('docs-swagger.php'),
             ], 'config');
         }
     }
 
-    public function register()
+    /**
+     * @return void
+     */
+    public function register(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([

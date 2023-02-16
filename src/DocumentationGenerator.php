@@ -4,18 +4,86 @@ namespace Sciarcinski\LaravelSwagger;
 
 use Evenement\EventEmitter;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use ReflectionException;
 
 class DocumentationGenerator extends EventEmitter
 {
     use Pathable;
 
+    /** @var array */
+    protected array $tags = [];
+
+    /**
+     * @param array $tags
+     * @return $this
+     */
+    public function setTags(array $tags): static
+    {
+        $this->tags = array_merge($this->tags, $tags);
+
+        return $this;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
     public function generate(array $config)
     {
-        $paths = [];
-        $tags = [];
+        $components = $this->prepareComponents();
+        $paths = $this->preparePath($config['routes']);
+        $tags = $this->prepareTagsGlobal($this->tags);
 
-        foreach ($config['routes'] as $routeName) {
+        $doc = [
+            'openapi' => '3.0.0',
+            'info' => [
+                'title' => 'REST API v1',
+                'version' => '1.0.0',
+            ],
+            'tags' => $tags,
+            'paths' => $paths,
+            'components' => $components,
+        ];
+
+        file_put_contents('/var/www/f24-api/docs/api/api.json', json_encode($doc, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * @return array
+     */
+    protected function prepareComponents(): array
+    {
+        $files = glob($this->getPathComponents() . '**/*.json');
+
+        $components = [];
+
+        foreach ($files as $file) {
+            $component = $this->loadFile($file);
+
+            $names = substr($file, strlen($this->getPathComponents()), -5);
+            $names = explode('/', $names);
+
+            if (! Arr::has($components, $names[0])) {
+                $components[$names[0]] = [];
+            }
+
+            $components[$names[0]][$names[1]] = $component;
+        }
+
+        return $components;
+    }
+
+    /**
+     * @param array $routes
+     *
+     * @throws ReflectionException
+     *
+     * @return array
+     */
+    protected function preparePath(array $routes): array
+    {
+        $paths = [];
+
+        foreach ($routes as $routeName) {
             $fileName = $this->transformFileName($routeName);
             $filePathConfig = $this->getPathConfig() . $fileName . '.json';
             $filePathResponses = $this->getPathResponses() . $fileName . '.json';
@@ -36,63 +104,53 @@ class DocumentationGenerator extends EventEmitter
                 'description' => $description ?? '',
                 'responses' => $responses,
                 'parameters' => [],
+                'security' => [],
             ];
 
             if (Arr::has($config, 'tags')) {
-                $tags = array_merge($this->transformTags($config['tags']), $tags);
+                $this->setTags($tags = $this->transformTagsPath($config['tags']));
                 $path['tags'] = $tags;
+            }
+
+            if (Arr::has($config, 'security') && ! empty($config['security'])) {
+                $path['security'] = [$this->transformSecurity($config['security'])];
             }
 
             if (Arr::has($config, 'deprecated')) {
                 $path['deprecated'] = $config['deprecated'];
             }
 
-            $rules = $router->getRulesRequest();
-
-            if (! empty($rules) && in_array($router->getMethod(), ['post', 'put'])) {
-                $path['requestBody'] = [
-                    'required' => ! empty($router->getRequired()),
-                    'content' => [
-                        'application/json' => [
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => array_map(function ($rule) {
-                                    unset($rule['required']);
-
-                                    return $rule;
-                                }, $rules),
-                            ],
-                        ],
-                    ],
-                ];
+            if (! empty($router->getRulesRequest()) && in_array($router->getMethod(), ['post', 'put'])) {
+                $path['requestBody'] = $this->transformRequestBody($router->getRequired(), $router->getRulesRequest());
             }
 
             if (Arr::has($config, 'merge')) {
-                foreach ($config['merge'] as $key => $merge) {
-                    if (! Arr::has($path, $key)) {
-                        $path[$key] = [];
-                    }
-
-                    if (is_array($path[$key])) {
-                        $path[$key] = array_merge($path[$key], $config['merge'][$key]);
-                    }
-                }
+                $path = $this->transformMerge($path, $config['merge']);
             }
 
             $paths[$router->getUrl()][$router->getMethod()] = $path;
         }
 
-        $doc = [
-            'openapi' => '3.0.0',
-            'info' => [
-                'title' => 'REST API v1',
-                'version' => '1.0.0',
-            ],
-            'tags' => $tags,
-            'paths' => $paths,
-        ];
+        return $paths;
+    }
 
-        file_put_contents('/var/www/f24-api/docs/api/api.json', json_encode($doc, JSON_PRETTY_PRINT));
+    /**
+     * @param array $tags
+     * @return array
+     */
+    protected function prepareTagsGlobal(array $tags): array
+    {
+        $tags = array_unique($tags);
+
+        $items = [];
+
+        foreach ($tags as $tag) {
+            $items[] = [
+                'name' => $tag,
+            ];
+        }
+
+        return $items;
     }
 
     /**
@@ -115,31 +173,24 @@ class DocumentationGenerator extends EventEmitter
     protected function transformRresponses(array $responses, ProcessRouter $router): array
     {
         foreach ($responses as $code => $response) {
-            if (is_string($response) && Str::startsWith($response, '#components')) {
-                $response = substr($response, 12);
-                $response = $this->getPathComponents() . $response;
-                $response = $this->loadFile($response);
-            }
+            if (is_string($response)) {
+                $responses[$code] = [
+                    '$ref' => $response,
+                ];
+            } else {
+                $code = strval($code);
 
-            $code = strval($code);
+                $responses[$code] = [
+                    'description' => Arr::get($response, 'description') ?? '',
+                ];
 
-            $responses[$code] = [
-                'description' => Arr::get($response, 'description') ?? '',
-                'content' => [],
-            ];
+                $contents = Arr::get($response, 'content', []);
 
-            $contents = Arr::get($response, 'content', []);
+                foreach ($contents as $content) {
+                    $responses[$code]['content'][$content['type']] = [];
 
-            foreach ($contents as $content) {
-                $responses[$code]['content'][$content['type']] = [];
-
-                if (Arr::has($content, 'example')) {
-                    $responses[$code]['content'][$content['type']]['example'] = $content['example'];
-
-                    if (Arr::get($content, 'example.errors') === 'required') {
-                        $responses[$code]['content'][$content['type']]['example']['errors'] = $this->transformRequired(
-                            $router->getRequired()
-                        );
+                    if (Arr::has($content, 'example')) {
+                        $responses[$code]['content'][$content['type']]['example'] = $content['example'];
                     }
                 }
             }
@@ -152,7 +203,7 @@ class DocumentationGenerator extends EventEmitter
      * @param array|string $tags
      * @return array
      */
-    protected function transformTags(array|string $tags): array
+    protected function transformTagsPath(array|string $tags): array
     {
         if (is_array($tags)) {
             return $tags;
@@ -163,18 +214,63 @@ class DocumentationGenerator extends EventEmitter
 
     /**
      * @param array $required
+     * @param array $rules
      * @return array
      */
-    protected function transformRequired(array $required = []): array
+    protected function transformRequestBody(array $required = [], array $rules = []): array
     {
-        $errors = [];
+        return [
+            'required' => ! empty($required),
+            'content' => [
+                'application/json' => [
+                    'schema' => [
+                        'type' => 'object',
+                        'properties' => array_map(function ($rule) {
+                            return Arr::except($rule, 'required');
+                        }, $rules),
+                        'required' => $required,
+                    ],
+                ],
+            ],
+        ];
+    }
 
-        foreach ($required as $key) {
-            $errors[$key] = [
-                'The ' . $key . ' field is required.',
-            ];
+    /**
+     * @param array $path
+     * @param array $merges
+     * @return array
+     */
+    protected function transformMerge(array $path, array $merges): array
+    {
+        foreach ($merges as $key => $merge) {
+            if (! Arr::has($path, $key)) {
+                $path[$key] = [];
+            }
+
+            if (is_array($path[$key])) {
+                $path[$key] = array_merge($path[$key], $merges[$key]);
+            }
         }
 
-        return $errors;
+        return $path;
+    }
+
+    /**
+     * @param array $security
+     * @return array
+     */
+    protected function transformSecurity(array $security = []): array
+    {
+        $items = [];
+
+        foreach ($security as $key => $item) {
+            if (is_numeric($key)) {
+                $items[$item] = [];
+            } else {
+                $items[$key] = [$item];
+            }
+        }
+
+        return $items;
     }
 }

@@ -10,7 +10,7 @@ trait Pathable
     protected string $docKey = 'api';
 
     /**
-     * @param string $documentation
+     * @param string $docKey
      * @return $this
      */
     public function setDocKey(string $docKey): static
@@ -25,7 +25,7 @@ trait Pathable
      */
     public function getPathConfig(): string
     {
-        return config('documentation.documentations.' . $this->docKey . '.paths.configs');
+        return config('docs-swagger.documentations.' . $this->docKey . '.paths.configs');
     }
 
     /**
@@ -33,7 +33,7 @@ trait Pathable
      */
     public function getPathResponses(): string
     {
-        return config('documentation.documentations.' . $this->docKey . '.paths.responses');
+        return config('docs-swagger.documentations.' . $this->docKey . '.paths.responses');
     }
 
     /**
@@ -41,7 +41,7 @@ trait Pathable
      */
     public function getPathComponents(): string
     {
-        return config('documentation.documentations.' . $this->docKey . '.paths.components');
+        return config('docs-swagger.documentations.' . $this->docKey . '.paths.components');
     }
 
     /**

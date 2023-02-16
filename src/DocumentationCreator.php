@@ -22,6 +22,7 @@ class DocumentationCreator
     }
 
     /**
+     * @param string $routeName
      * @param bool $routeResource
      * @return array
      */
@@ -37,13 +38,12 @@ class DocumentationCreator
     }
 
     /**
-     * @param string $docName
      * @param string $routeName
      * @return array
      */
     protected function createFiles(string $routeName): array
     {
-        /** @var \Illuminate\Routing\Route $route */
+        /** @var Route $route */
         $route = $this->router->getRoutes()->getByName($routeName);
 
         $fileName = $this->transformFileName($routeName);
@@ -87,6 +87,7 @@ class DocumentationCreator
             'summary' => $route->getName(),
             'description' => null,
             'operationId' => $route->getName(),
+            'security' => [],
             'merge' => [],
         ];
 
@@ -131,32 +132,34 @@ class DocumentationCreator
         switch ($route->getActionMethod()) {
             case 'index':
                 $data['200'] = $success;
-                $data['401'] = '#components/response_unauthorized.json';
+                $data['401'] = '#/components/responses/unauthorized';
                 break;
 
             case 'show':
                 $data['200'] = $success;
-                $data['401'] = '#components/response_unauthorized.json';
-                $data['404'] = '#components/response_not_found_http.json';
+                $data['401'] = '#/components/responses/unauthorized';
+                $data['404'] = '#/components/responses/not_found_http';
                 break;
 
             case 'store':
                 $data['201'] = $success;
-                $data['401'] = '#components/response_unauthorized.json';
-                $data['422'] = '#components/response_invalidation.json';
+                $data['401'] = '#/components/responses/unauthorized';
+                $data['422'] = '#/components/responses/invalidation';
                 break;
 
             case 'update':
                 $data['200'] = $success;
-                $data['401'] = '#components/response_unauthorized.json';
-                $data['404'] = '#components/response_not_found_http.json';
-                $data['422'] = '#components/response_invalidation.json';
+                $data['401'] = '#/components/responses/unauthorized';
+                $data['404'] = '#/components/responses/not_found_http';
+                $data['422'] = '#/components/responses/invalidation';
                 break;
 
             case 'destroy':
-                $data['204'] = $success;
-                $data['401'] = '#components/response_unauthorized.json';
-                $data['404'] = '#components/response_not_found_http.json';
+                $data['204'] = [
+                    'description' => '',
+                ];
+                $data['401'] = '#/components/responses/unauthorized';
+                $data['404'] = '#/components/responses/not_found_http';
                 break;
         }
 

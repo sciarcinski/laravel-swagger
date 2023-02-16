@@ -20,7 +20,7 @@ class GeneratorCommand extends Command
      */
     public function handle(): void
     {
-        $documentations = config('documentation.documentations', []);
+        $documentations = config('docs-swagger.documentations', []);
         $generator = app()->make(DocumentationGenerator::class);
 
         foreach ($documentations as $docKey => $documentation) {
