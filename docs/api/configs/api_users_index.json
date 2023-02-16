@@ -1,0 +1,10 @@
+{
+    "tags": ["Users"],
+    "summary": "api_users_index",
+    "description": null,
+    "operationId": "api_users_index",
+    "security": ["BearerAuth"],
+    "merge": {
+        "parameters": []
+    }
+}
