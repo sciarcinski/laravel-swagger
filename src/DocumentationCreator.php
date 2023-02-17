@@ -155,9 +155,7 @@ class DocumentationCreator
                 break;
 
             case 'destroy':
-                $data['204'] = [
-                    'description' => '',
-                ];
+                $data['204'] = '#/components/responses/no_content';
                 $data['401'] = '#/components/responses/unauthorized';
                 $data['404'] = '#/components/responses/not_found_http';
                 break;

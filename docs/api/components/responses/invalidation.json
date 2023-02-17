@@ -1,0 +1,12 @@
+{
+    "description": "Validation Error",
+    "content": {
+        "application/json": {
+            "example": {
+                "code": "ValidationException",
+                "message": "The name field is required.",
+                "errors": []
+            }
+        }
+    }
+}

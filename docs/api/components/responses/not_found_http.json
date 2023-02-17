@@ -1,0 +1,12 @@
+{
+    "description": "Data not found",
+    "content": {
+        "application/json": {
+            "example": {
+                "code": "NotFoundHttpException",
+                "message": "No query results for model [App\\Models\\License].",
+                "errors": []
+            }
+        }
+    }
+}

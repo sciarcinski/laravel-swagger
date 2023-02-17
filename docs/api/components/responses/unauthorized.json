@@ -1,0 +1,12 @@
+{
+    "description": "Not authenticated",
+    "content": {
+        "application/json": {
+            "example": {
+                "code": "AuthenticationException",
+                "message": "Unauthenticated.",
+                "errors": []
+            }
+        }
+    }
+}
