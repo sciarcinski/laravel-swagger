@@ -4,7 +4,7 @@
         "application/json": {
             "example": {
                 "code": "NotFoundHttpException",
-                "message": "No query results for model [App\\Models\\License].",
+                "message": "No query results",
                 "errors": []
             }
         }
