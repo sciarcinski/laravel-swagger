@@ -87,7 +87,7 @@ class DocumentationCreator
             'summary' => $route->getName(),
             'description' => null,
             'operationId' => $route->getName(),
-            'security' => [],
+            'security' => config('docs-swagger.default_security', []),
             'merge' => [],
         ];
 

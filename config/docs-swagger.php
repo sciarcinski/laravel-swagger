@@ -11,6 +11,7 @@ return [
     'documentations' => [
         'api' => [
             'title' => 'API',
+            'default_security' => [],
             'paths' => [
                 'doc_json' => storage_path('docs/api/api.json'),
                 'version' => storage_path('docs/api/components/version.json'),
