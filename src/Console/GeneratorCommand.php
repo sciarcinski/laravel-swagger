@@ -14,29 +14,34 @@ class GeneratorCommand extends Command
     protected $description = 'Documentation generator';
 
     /**
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      *
      * @return void
      */
     public function handle(): void
     {
         $documentations = config('docs-swagger.documentations', []);
-        $generator = app()->make(DocumentationGenerator::class);
+        $generator = new DocumentationGenerator;
 
         foreach ($documentations as $docKey => $documentation) {
             $this->info(date('Y-m-d H:i:s') . ' [' . $docKey . '] Documentation generator started');
             $this->line('');
 
+            $bar = null;
             $routes = count($documentation['routes']);
-            $bar = $this->output->createProgressBar($routes);
+
+            $generator->on('start', function () use (&$bar, $routes) {
+                $bar = $this->output->createProgressBar($routes);
+            });
+            $generator->on('progress', function () use (&$bar) {
+                $bar->advance();
+            });
+            $generator->on('finish', function () use (&$bar) {
+                $bar->finish();
+            });
 
             $generator->setDocKey($docKey);
-            $generator->on('progress', function () use ($bar) {
-            $bar->advance();
-            });
             $generator->generate($documentation);
-
-            $bar->finish();
 
             $this->line('');
             $this->line('');

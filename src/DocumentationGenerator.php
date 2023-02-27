@@ -29,6 +29,8 @@ class DocumentationGenerator extends EventEmitter
      */
     public function generate(array $config)
     {
+        $this->emit('start', [$config]);
+
         $components = $this->prepareComponents();
         $paths = $this->preparePath($config['routes']);
         $tags = $this->prepareTagsGlobal($this->tags);
@@ -45,6 +47,8 @@ class DocumentationGenerator extends EventEmitter
         ];
 
         file_put_contents($this->getPathDocJson(), json_encode($doc, JSON_PRETTY_PRINT));
+
+        $this->emit('finish', [$this->getPathDocJson()]);
     }
 
     /**
@@ -84,6 +88,8 @@ class DocumentationGenerator extends EventEmitter
         $paths = [];
 
         foreach ($routes as $routeName) {
+            $this->emit('progress', [$routeName]);
+
             $fileName = $this->transformFileName($routeName);
             $filePathConfig = $this->getPathConfig() . $fileName . '.json';
             $filePathResponses = $this->getPathResponses() . $fileName . '.json';
@@ -102,9 +108,9 @@ class DocumentationGenerator extends EventEmitter
                 'summary' => Arr::get($config, 'summary', $routeName),
                 'operationId' => Arr::get($config, 'operationId', $routeName),
                 'description' => $description ?? '',
-                'responses' => $responses,
                 'parameters' => [],
                 'security' => [],
+                'responses' => $responses,
             ];
 
             if (Arr::has($config, 'tags')) {
@@ -219,7 +225,7 @@ class DocumentationGenerator extends EventEmitter
      */
     protected function transformRequestBody(array $required = [], array $rules = []): array
     {
-        return [
+        $body = [
             'required' => ! empty($required),
             'content' => [
                 'application/json' => [
@@ -228,11 +234,16 @@ class DocumentationGenerator extends EventEmitter
                         'properties' => array_map(function ($rule) {
                             return Arr::except($rule, 'required');
                         }, $rules),
-                        'required' => $required,
                     ],
                 ],
             ],
         ];
+
+        if (! empty($required)) {
+            $body['content']['application/json']['schema']['required'] = $required;
+        }
+
+        return $body;
     }
 
     /**

@@ -23,6 +23,14 @@ trait Pathable
     /**
      * @return string
      */
+    public function getDocKey(): string
+    {
+        return $this->docKey;
+    }
+
+    /**
+     * @return string
+     */
     public function getPathConfig(): string
     {
         return config('docs-swagger.documentations.' . $this->docKey . '.paths.configs');
