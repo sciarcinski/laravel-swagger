@@ -5,22 +5,25 @@
  * php artisan make:documentation {api_key} {route_name}
  * php artisan make:documentation {api_key} {route_group_name} --resource
  * php artisan documentation:generator
- * php artisan documentation:check
  */
 return [
     'documentations' => [
         [
             'key' => 'api',
             'title' => 'API',
+            'description' => '',
+            'version' => '1.0.0',
             'default_security' => [],
-            'paths' => [
-                'doc_json' => storage_path('docs/api/api.json'),
-                'version' => storage_path('docs/api/version.json'),
-                'components' => storage_path('docs/api/components/'),
-                'configs' => storage_path('docs/api/configs/'),
-                'responses' => storage_path('docs/api/responses/'),
+            'path_doc_json' => storage_path('docs/api/api.json'),
+            'path_components' => storage_path('docs/api/components/'),
+            'path_routes' => storage_path('docs/api/routes/'),
+            'names' => [
+                //'users.index',
+                //'users.show',
+                //'users.store',
+                //'users.update',
+                //'users.destroy',
             ],
-            'routes' => [],
         ],
     ],
 ];

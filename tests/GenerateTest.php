@@ -17,15 +17,13 @@ class GenerateTest extends TestCase
             'key' => 'api',
             'title' => 'API',
             'default_security' => [],
-            'path_doc_json' => base_path('tests/docs/api.json'),
-            'path_components' => base_path('tests/docs/components/'),
-            'path_routes' => base_path('tests/docs/routes/'),
+            'path_doc_json' => base_path('tests/doc_generate/api.json'),
+            'path_components' => base_path('tests/doc_generate/components/'),
+            'path_routes' => base_path('tests/doc_generate/routes/'),
             'names' => [
                 'users.index',
                 'users.show',
                 'users.store',
-                //'users.update',
-                //'users.destroy',
             ],
         ];
 
@@ -33,11 +31,13 @@ class GenerateTest extends TestCase
         $routes = app('router')->getRoutes();
 
         $generator = new Generator($config, $routes, new Documentation());
-        $generator->on('error', function ($name, $e) {
-            dd($e);
-        });
         $generator->process();
 
-        //dd($generator);
+        // verify
+        $this->assertFileExists($config['path_doc_json']);
+
+        $this->beforeApplicationDestroyed(function () use ($config) {
+            @unlink($config['path_doc_json']);
+        });
     }
 }

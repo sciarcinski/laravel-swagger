@@ -17,6 +17,8 @@ class Generator extends EventEmitter
     protected array $config = [
         'key' => 'api',
         'title' => 'API',
+        'description' => '',
+        'version' => '1.0.0',
         'default_security' => [],
         'names' => [],
         'path_doc_json' => null,
@@ -66,6 +68,9 @@ class Generator extends EventEmitter
         $this->components();
         $this->routes();
 
+        $this->doc->setTitle($this->config('title'));
+        $this->doc->setDescription($this->config('description'));
+        $this->doc->setVersion($this->config('version'));
         $this->doc->save($this->config('path_doc_json'));
 
         $this->emit('finish', [$this]);
@@ -77,7 +82,7 @@ class Generator extends EventEmitter
     public function components(): void
     {
         $components = [];
-        $path = $this->config('path_components');
+        $path = Str::finish($this->config('path_components'), '/');
 
         if ($path && is_dir($path)) {
             $components = (new ComponentsProcess())->process($path);
