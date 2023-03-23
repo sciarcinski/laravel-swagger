@@ -11,6 +11,9 @@ class ParameterProcess
     /** @var ReflectionParameter */
     protected ReflectionParameter $parameter;
 
+    /** @var string */
+    protected string $type;
+
     /** @var array */
     protected array $path = [];
 
@@ -34,17 +37,55 @@ class ParameterProcess
     }
 
     /**
+     * @return array
+     */
+    public function getPath(): array
+    {
+        return $this->path;
+    }
+
+    /**
      * @return $this
      */
     public function process(): static
     {
-        $class = $this->parameter->getType()->getName();
+        $this->type = $this->determineType();
 
-        if (method_exists($class, 'rules')) {
-            $this->query = $this->query((new $class())->rules());
+        if ($this->type === 'class') {
+            $class = $this->parameter->getType()->getName();
+
+            if (method_exists($class, 'rules')) {
+                $this->query = $this->query((new $class())->rules());
+            }
+        } else {
+            $this->path = [
+                'position' => $this->parameter->getPosition(),
+                'name' => $this->parameter->getName(),
+                'type' => $this->queryType([$this->type]),
+            ];
         }
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function determineType(): string
+    {
+        $type = $this->parameter->getType();
+
+        if (is_null($type)) {
+            return 'int';
+        }
+
+        $name = $type->getName();
+
+        if (class_exists($name)) {
+            return 'class';
+        }
+
+        return $name;
     }
 
     /**
@@ -94,7 +135,7 @@ class ParameterProcess
             $item['nullable'] = true;
         }
 
-        // multi: array, object
+        // array, object
         if (Str::contains($name, '.')) {
             [$name, $item] = $this->queryArray($query, $name, $values);
         }
@@ -115,11 +156,15 @@ class ParameterProcess
      */
     protected function queryType(array $values): string
     {
-        $types = ['string', 'integer', 'boolean', 'array'];
-
         if (in_array('numeric', $values)) {
             return 'number';
         }
+
+        if (in_array('int', $values)) {
+            return 'integer';
+        }
+
+        $types = ['string', 'integer', 'boolean', 'array'];
 
         foreach ($types as $type) {
             if (in_array($type, $values)) {
@@ -131,11 +176,11 @@ class ParameterProcess
     }
 
     /**
-     * @param string $name
      * @param array $query
+     * @param string $name
      * @return array
      */
-    protected function queryFindOrNew(string $name, array $query): array
+    protected function queryFindOrNew(array $query, string $name): array
     {
         if (! Arr::has($query, $name)) {
             $query[$name] = [];
@@ -162,7 +207,7 @@ class ParameterProcess
             $item = $this->queryArrayProperties([], $names, $element, $values);
             $item = array_shift($item);
         } else {
-            $item = $this->queryFindOrNew($parent, $query);
+            $item = $this->queryFindOrNew($query, $parent);
 
             if (! empty($names)) {
                 if (! Arr::has($item, 'properties')) {
@@ -207,7 +252,7 @@ class ParameterProcess
             return $query;
         }
 
-        $query[$name] = $this->queryFindOrNew($name, $query);
+        $query[$name] = $this->queryFindOrNew($query, $name);
         $query[$name]['properties'] = $this->queryArrayProperties($query[$name]['properties'], $names, $element, $values);
 
         return $query;

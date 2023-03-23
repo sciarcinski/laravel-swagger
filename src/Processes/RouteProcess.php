@@ -13,23 +13,23 @@ class RouteProcess
     /** @var Route */
     protected Route $route;
 
-    /** @var string */
-    protected string $path;
+    /** @var string|null */
+    protected ?string $path;
 
     /** @var array */
-    protected array $config;
+    protected array $config = [];
 
     /** @var array */
-    protected array $responses;
+    protected array $responses = [];
 
     /** @var array */
-    protected array $parameters;
+    protected array $parameters = [];
 
     /**
      * @param Route $route
-     * @param string $path
+     * @param string|null $path
      */
-    public function __construct(Route $route, string $path)
+    public function __construct(Route $route, string $path = null)
     {
         $this->route = $route;
         $this->path = $path;
@@ -42,8 +42,11 @@ class RouteProcess
      */
     public function process(): void
     {
-        $this->config = json_decode(file_get_contents($this->path), true);
-        $this->responses = $this->processResponses();
+        if (! is_null($this->path)) {
+            $this->config = json_decode(file_get_contents($this->path), true);
+            $this->responses = $this->processResponses();
+        }
+
         $this->parameters = $this->processParameters();
     }
 

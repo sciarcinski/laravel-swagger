@@ -6,6 +6,9 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use ReflectionException;
+use Sciarcinski\LaravelSwagger\Processes\ParameterProcess;
+use Sciarcinski\LaravelSwagger\Processes\RouteProcess;
 
 class Creator
 {
@@ -50,6 +53,8 @@ class Creator
     }
 
     /**
+     * @throws ReflectionException
+     *
      * @return array
      */
     public function create(): array
@@ -57,7 +62,7 @@ class Creator
         $routes = $this->resource ? $this->prepareResourceName($this->route) : [$this->route];
 
         foreach ($routes as $route) {
-            $this->createFiles($route);
+            $this->createFile($route);
         }
 
         return $routes;
@@ -84,15 +89,16 @@ class Creator
 
     /**
      * @param string $routeName
+     *
+     * @throws ReflectionException
+     *
      * @return string
      */
-    protected function createFiles(string $routeName): string
+    protected function createFile(string $routeName): string
     {
         $path = Str::finish($this->config('path_routes'), '/');
         $route = $this->routes->getByName($routeName);
         $file = $path . $this->transformFileName($routeName) . '.json';
-
-        dd($route);
 
         if (! file_exists($file)) {
             $data = [
@@ -105,7 +111,11 @@ class Creator
                 'responses' => $this->responses($route),
             ];
 
-            dd($data);
+            if (! empty($parameters = $this->parameters($route))) {
+                $data['merge']['parameters'] = $parameters;
+            }
+
+            file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         }
 
         return $file;
@@ -195,48 +205,69 @@ class Creator
     }
 
     /**
-     * @param string $path
-     * @param array $data
-     * @return string
+     * @param Route $route
+     *
+     * @throws ReflectionException
+     *
+     * @return array
      */
-    protected function createFile(string $path, array $data = []): string
+    protected function parameters(Route $route): array
     {
-        file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
+        $paths = $this->parametersRouteProcess($route);
+        $urls = $this->parametersRouteUri($route);
+        $result = [];
 
-        return $path;
+        if (count($paths) === count($urls)) {
+            $parameters = array_combine($urls, $paths);
+
+            foreach ($parameters as $parameter => $type) {
+                $result[] = [
+                    'in' => 'path',
+                    'name' => $parameter,
+                    'required' => true,
+                    'description' => $parameter,
+                    'schema' => [
+                        'type' => $type,
+                    ],
+                ];
+            }
+        }
+
+        return $result;
     }
 
     /**
-     * @param string $path
      * @param Route $route
-     * @return string
+     *
+     * @throws ReflectionException
+     *
+     * @return array
      */
-    protected function createFileConfig(string $path, Route $route): string
+    protected function parametersRouteProcess(Route $route): array
     {
-        $data = [
-            'tags' => [],
-            'summary' => $route->getName(),
-            'description' => null,
-            'operationId' => $route->getName(),
-            'security' => config('docs-swagger.documentations.' . $this->docKey . '.default_security', []),
-            'merge' => [],
-        ];
+        $process = new RouteProcess($route);
+        $process->process();
 
+        $paths = [];
+
+        /** @var ParameterProcess $parameter */
+        foreach ($process->getParameters() as $parameter) {
+            if (! empty($path = $parameter->getPath())) {
+                $paths[] = $path['type'];
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
+     * @param Route $route
+     * @return array
+     */
+    protected function parametersRouteUri(Route $route): array
+    {
         preg_match_all('/\{(.*?)\}/', $route->uri(), $parameters);
-        $parameters = Arr::get($parameters, 1, []);
 
-        $data['merge']['parameters'] = array_map(function ($parameter) {
-            return [
-                'in' => 'path',
-                'name' => $parameter,
-                'required' => true,
-                'description' => $parameter,
-                'schema' => [
-                    'type' => 'integer',
-                ],
-            ];
-        }, $parameters);
-
-        return $this->createFile($path, $data);
+        return Arr::get($parameters, 1, []);
     }
 }

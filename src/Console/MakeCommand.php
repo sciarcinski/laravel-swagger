@@ -21,7 +21,7 @@ class MakeCommand extends Command
     /**
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $apiKey = $this->argument('apiKey');
         $config = Arr::first(config('docs-swagger.documentations', []), function ($doc) use ($apiKey) {
