@@ -3,7 +3,7 @@
 namespace Sciarcinski\LaravelSwagger\Console;
 
 use Illuminate\Console\Command;
-use Sciarcinski\LaravelSwagger\DocumentationGenerator;
+use Sciarcinski\LaravelSwagger\Generator;
 
 class GeneratorCommand extends Command
 {
@@ -21,31 +21,31 @@ class GeneratorCommand extends Command
     public function handle(): void
     {
         $documentations = config('docs-swagger.documentations', []);
-        $generator = new DocumentationGenerator;
+        $generator = new Generator;
 
-        foreach ($documentations as $docKey => $documentation) {
-            $this->info(date('Y-m-d H:i:s') . ' [' . $docKey . '] Documentation generator started');
+        foreach ($documentations as $documentation) {
+            $this->info(date('Y-m-d H:i:s') . ' [' . $documentation['key'] . '] Documentation generator started');
             $this->line('');
 
             $bar = null;
             $routes = count($documentation['routes']);
 
-            $generator->on('start', function () use (&$bar, $routes) {
+            $generator->once('start', function () use (&$bar, $routes) {
                 $bar = $this->output->createProgressBar($routes);
             });
-            $generator->on('progress', function () use (&$bar) {
+            $generator->once('progress', function () use (&$bar) {
                 $bar->advance();
             });
-            $generator->on('finish', function () use (&$bar) {
+            $generator->once('finish', function () use (&$bar) {
                 $bar->finish();
             });
 
-            $generator->setDocKey($docKey);
-            $generator->generate($documentation);
+            //$generator->setDocKey($documentation['key']);
+            //$generator->generate($documentation);
 
             $this->line('');
             $this->line('');
-            $this->info(date('Y-m-d H:i:s') . ' [' . $docKey . '] Documentation generator ended');
+            $this->info(date('Y-m-d H:i:s') . ' [' . $documentation['key'] . '] Documentation generator ended');
         }
     }
 }

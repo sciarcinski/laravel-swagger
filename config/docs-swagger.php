@@ -2,14 +2,15 @@
 
 /**
  * php artisan route:list --name=api
- * php artisan make:documentation {name}
- * php artisan make:documentation {name} --resource
+ * php artisan make:documentation {api_key} {route_name}
+ * php artisan make:documentation {api_key} {route_group_name} --resource
  * php artisan documentation:generator
  * php artisan documentation:check
  */
 return [
     'documentations' => [
-        'api' => [
+        [
+            'key' => 'api',
             'title' => 'API',
             'default_security' => [],
             'paths' => [

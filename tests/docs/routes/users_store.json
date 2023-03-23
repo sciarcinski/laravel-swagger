@@ -1,0 +1,30 @@
+{
+  "tags": [
+    "Users"
+  ],
+  "summary": "Add user",
+  "description": null,
+  "operationId": "api.users.store",
+  "security": [
+    "BearerAuth"
+  ],
+  "responses": {
+    "201": {
+      "description": "Successful response",
+      "content": {
+        "application\/json": {
+          "example": {
+            "uuid": "cbcf8beb-475e-31a0-ab60-d714156f37d4",
+            "name": "Earnestine Prosacco",
+            "email": "iwill@yahoo.com",
+            "phone": "843.666.7022",
+            "updated_at": "2022-10-01 07:10:00",
+            "created_at": "2022-10-01 07:10:00"
+          }
+        }
+      }
+    },
+    "401": "#\/components\/responses\/unauthorized",
+    "422": "#\/components\/responses\/invalidation"
+  }
+}
