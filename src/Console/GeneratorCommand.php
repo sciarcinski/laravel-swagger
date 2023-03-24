@@ -3,6 +3,9 @@
 namespace Sciarcinski\LaravelSwagger\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Routing\RouteCollection;
+use ReflectionException;
+use Sciarcinski\LaravelSwagger\Documentation;
 use Sciarcinski\LaravelSwagger\Generator;
 
 class GeneratorCommand extends Command
@@ -14,24 +17,27 @@ class GeneratorCommand extends Command
     protected $description = 'Documentation generator';
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      *
      * @return void
      */
     public function handle(): void
     {
         $documentations = config('docs-swagger.documentations', []);
-        $generator = new Generator;
+
+        /** @var RouteCollection $routes */
+        $routes = app('router')->getRoutes();
 
         foreach ($documentations as $documentation) {
             $this->info(date('Y-m-d H:i:s') . ' [' . $documentation['key'] . '] Documentation generator started');
             $this->line('');
 
             $bar = null;
-            $routes = count($documentation['routes']);
+            $count = count($documentation['names']);
 
-            $generator->once('start', function () use (&$bar, $routes) {
-                $bar = $this->output->createProgressBar($routes);
+            $generator = new Generator($documentation, $routes, new Documentation());
+            $generator->once('start', function () use (&$bar, $count) {
+                $bar = $this->output->createProgressBar($count);
             });
             $generator->once('progress', function () use (&$bar) {
                 $bar->advance();
@@ -39,9 +45,7 @@ class GeneratorCommand extends Command
             $generator->once('finish', function () use (&$bar) {
                 $bar->finish();
             });
-
-            //$generator->setDocKey($documentation['key']);
-            //$generator->generate($documentation);
+            $generator->process();
 
             $this->line('');
             $this->line('');
