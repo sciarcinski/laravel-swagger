@@ -3,14 +3,15 @@
 namespace Sciarcinski\LaravelSwagger\Processes;
 
 use Illuminate\Support\Arr;
+use Sciarcinski\LaravelSwagger\Path;
 
 class PathProcess
 {
+    /** @var Path */
+    protected Path $path;
+
     /** @var RouteProcess */
     protected RouteProcess $route;
-
-    /** @var array */
-    protected array $data = [];
 
     /**
      * @param RouteProcess $route
@@ -21,11 +22,11 @@ class PathProcess
     }
 
     /**
-     * @return array
+     * @return Path
      */
-    public function all(): array
+    public function getPath(): Path
     {
-        return $this->data;
+        return $this->path;
     }
 
     /**
@@ -45,9 +46,9 @@ class PathProcess
     }
 
     /**
-     * @return void
+     * @return $this
      */
-    public function process(): void
+    public function process(): static
     {
         $data = [
             'tags' => $this->route->getTags(),
@@ -80,7 +81,9 @@ class PathProcess
             $data = $this->transformMerge($data, $this->route->getMerge());
         }
 
-        $this->data = $data;
+        $this->path = new Path($data, $this->getMethod(), $this->getUrl());
+
+        return $this;
     }
 
     /**

@@ -24,6 +24,7 @@ class Generator extends EventEmitter
         'path_doc_json' => null,
         'path_components' => null,
         'path_routes' => null,
+        'generators' => [],
     ];
 
     /** @var RouteCollection */
@@ -79,7 +80,7 @@ class Generator extends EventEmitter
     /**
      * @return void
      */
-    public function components(): void
+    protected function components(): void
     {
         $components = [];
         $path = Str::finish($this->config('path_components'), '/');
@@ -99,7 +100,7 @@ class Generator extends EventEmitter
      *
      * @return void
      */
-    public function routes(): void
+    protected function routes(): void
     {
         $path = $this->config('path_routes');
         $names = $this->config('names');
@@ -108,9 +109,11 @@ class Generator extends EventEmitter
             $route = new RouteProcess($this->routes->getByName($name), $path . $this->transformFileName($name) . '.json');
             $route->process();
 
-            $routePath = new PathProcess($route);
-            $routePath->process();
+            $routePath = (new PathProcess($route))
+                ->process()
+                ->getPath();
 
+            $this->generators($routePath);
             $this->emit('progress', [$name, $route]);
 
             $this->doc->setTags($route->getTags());
@@ -125,5 +128,23 @@ class Generator extends EventEmitter
     protected function transformFileName(string $name): string
     {
         return Str::slug(Str::replace('.', '_', $name), '_');
+    }
+
+    /**
+     * @param Path $path
+     * @return void
+     */
+    protected function generators(Path $path): void
+    {
+        array_map(fn ($generator) => $this->generator(new $generator($path)), $this->config('generators'));
+    }
+
+    /**
+     * @param GeneratorContract $generator
+     * @return void
+     */
+    protected function generator(GeneratorContract $generator): void
+    {
+        $generator->handle();
     }
 }

@@ -24,6 +24,7 @@ return [
                 //'users.update',
                 //'users.destroy',
             ],
+            'generators' => [],
         ],
     ],
 ];

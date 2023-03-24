@@ -25,6 +25,9 @@ class GenerateTest extends TestCase
                 'users.show',
                 'users.store',
             ],
+            'generators' => [
+                \Tests\Stubs\Generators\GenerateTest::class,
+            ],
         ];
 
         /** @var RouteCollection $routes */

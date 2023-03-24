@@ -2,8 +2,6 @@
 
 namespace Sciarcinski\LaravelSwagger;
 
-use Sciarcinski\LaravelSwagger\Processes\PathProcess;
-
 class Documentation
 {
     /** @var string */
@@ -61,9 +59,9 @@ class Documentation
         if (! empty($this->paths)) {
             $doc['paths'] = [];
 
-            /** @var PathProcess $path */
+            /** @var Path $path */
             foreach ($this->paths as $path) {
-                $doc['paths'][$path->getUrl()][$path->getMethod()] = $path->all();
+                $doc['paths'][$path->url][$path->method] = $path->data;
             }
         }
 
@@ -147,10 +145,10 @@ class Documentation
     }
 
     /**
-     * @param PathProcess $path
+     * @param Path $path
      * @return $this
      */
-    public function setPath(PathProcess $path): static
+    public function setPath(Path $path): static
     {
         $this->paths[] = $path;
 
