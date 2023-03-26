@@ -3,18 +3,11 @@
 namespace Tests;
 
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Sciarcinski\LaravelSwagger\LaravelSwaggerServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->registerRoutes();
-    }
-
     /**
      * @param Application $app
      * @return array
@@ -30,16 +23,18 @@ abstract class TestCase extends BaseTestCase
      * @param Application $app
      * @return void
      */
-    protected function defineEnvironment($app)
+    protected function defineEnvironment($app): void
     {
         $app->setBasePath(__DIR__ . '/..');
     }
 
     /**
+     * @param $router
      * @return void
      */
-    public function registerRoutes(): void
+    protected function defineRoutes($router): void
     {
-        Route::apiResource('users', \Tests\Stubs\Controllers\UserController::class);
+        $router->put('users/{users}/ban', [\Tests\Stubs\Controllers\UserController::class, 'ban'])->name('users.ban');
+        $router->apiResource('users', \Tests\Stubs\Controllers\UserController::class);
     }
 }

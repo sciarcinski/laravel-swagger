@@ -2,10 +2,12 @@
 
 namespace Sciarcinski\LaravelSwagger\Console;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
 use Sciarcinski\LaravelSwagger\Creator;
+use Throwable;
 
 class MakeCommand extends Command
 {
@@ -19,40 +21,42 @@ class MakeCommand extends Command
     protected $description = 'Create a new documentation file';
 
     /**
-     * @throws \ReflectionException
-     *
      * @return int
      */
     public function handle(): int
     {
-        $apiKey = $this->argument('apiKey');
-        $config = Arr::first(config('docs-swagger.documentations', []), function ($doc) use ($apiKey) {
-            return $doc['key'] === $apiKey;
-        });
+        try {
+            $apiKey = $this->argument('apiKey');
+            $config = Arr::first(config('docs-swagger.documentations', []), function ($doc) use ($apiKey) {
+                return $doc['key'] === $apiKey;
+            });
 
-        if (empty($config)) {
-            $this->error('No configuration for API key: ' . $apiKey);
+            if (empty($config)) {
+                throw new Exception('No configuration for API key: ' . $apiKey);
+            }
+
+            /** @var RouteCollection $routes */
+            $routes = app('router')->getRoutes();
+
+            $creator = new Creator(
+                $config,
+                $routes,
+                $this->argument('apiKey'),
+                $this->argument('route'),
+                (bool) $this->option('resource')
+            );
+
+            $routes = $creator->create();
+
+            foreach ($routes as $route) {
+                $this->info('\'' . $route . '\',');
+            }
+
+            return 0;
+        } catch (Throwable $e) {
+            $this->error($e->getMessage());
 
             return 1;
         }
-
-        /** @var RouteCollection $routes */
-        $routes = app('router')->getRoutes();
-
-        $creator = new Creator(
-            $config,
-            $routes,
-            $this->argument('apiKey'),
-            $this->argument('route'),
-            (bool) $this->option('resource')
-        );
-
-        $routes = $creator->create();
-
-        foreach ($routes as $route) {
-            $this->info('\'' . $route . '\',');
-        }
-
-        return 0;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Sciarcinski\LaravelSwagger;
 
+use Exception;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
@@ -81,6 +82,15 @@ class Creator
      */
     protected function prepareResourceName(string $routeName): array
     {
+        $names = ['index', 'show', 'store', 'update', 'destroy'];
+
+        foreach ($names as $name) {
+            if (Str::endsWith($routeName, $name)) {
+                $routeName = substr($routeName, 0, strlen($routeName) - strlen($name) - 1);
+                break;
+            }
+        }
+
         $routes = [];
 
         foreach (['index', 'show', 'store', 'update', 'destroy'] as $item) {
@@ -97,6 +107,7 @@ class Creator
     /**
      * @param string $routeName
      *
+     * @throws Exception
      * @throws ReflectionException
      *
      * @return string
@@ -105,6 +116,11 @@ class Creator
     {
         $path = Str::finish($this->config('path_routes'), '/');
         $route = $this->routes->getByName($routeName);
+
+        if (is_null($route)) {
+            throw new Exception('Route name [' . $routeName . '] does not exist');
+        }
+
         $file = $path . $this->transformFileName($routeName) . '.json';
 
         if (! file_exists($file)) {

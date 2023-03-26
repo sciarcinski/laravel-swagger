@@ -1,6 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Tests\Console;
+
+use Tests\TestCase;
 
 class GeneratorCommandTest extends TestCase
 {

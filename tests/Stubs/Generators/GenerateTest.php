@@ -3,9 +3,8 @@
 namespace Tests\Stubs\Generators;
 
 use Sciarcinski\LaravelSwagger\Storage;
-use Sciarcinski\LaravelSwagger\TransformerContract;
 
-class GenerateTest implements TransformerContract
+class GenerateTest
 {
     /** @var Storage */
     protected Storage $path;

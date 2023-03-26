@@ -4,7 +4,7 @@ namespace Tests\Stubs\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserStoreRequest extends FormRequest
+class UserRequest extends FormRequest
 {
     /**
      * @return array

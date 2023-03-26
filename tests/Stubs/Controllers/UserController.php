@@ -3,7 +3,7 @@
 namespace Tests\Stubs\Controllers;
 
 use Illuminate\Routing\Controller;
-use Tests\Stubs\Requests\UserStoreRequest;
+use Tests\Stubs\Requests\UserRequest;
 
 class UserController extends Controller
 {
@@ -25,10 +25,38 @@ class UserController extends Controller
     }
 
     /**
-     * @param UserStoreRequest $request
+     * @param UserRequest $request
      * @return bool
      */
-    public function store(UserStoreRequest $request): bool
+    public function store(UserRequest $request): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param int $id
+     * @param UserRequest $request
+     * @return true
+     */
+    public function update(int $id, UserRequest $request): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function destroy(int $id): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function ban(int $id): bool
     {
         return true;
     }
