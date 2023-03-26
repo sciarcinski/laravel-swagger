@@ -21,6 +21,8 @@ class MakeCommandTest extends TestCase
                     'path_components' => base_path('tests/doc_make/components/'),
                     'path_routes' => base_path('tests/doc_make/routes/'),
                     'names' => [],
+                    'generators' => [],
+                    'creators' => [],
                 ],
             ],
         ]);

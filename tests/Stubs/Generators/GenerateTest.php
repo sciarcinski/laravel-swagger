@@ -2,18 +2,18 @@
 
 namespace Tests\Stubs\Generators;
 
-use Sciarcinski\LaravelSwagger\GeneratorContract;
-use Sciarcinski\LaravelSwagger\Path;
+use Sciarcinski\LaravelSwagger\Storage;
+use Sciarcinski\LaravelSwagger\TransformerContract;
 
-class GenerateTest implements GeneratorContract
+class GenerateTest implements TransformerContract
 {
-    /** @var Path */
-    protected Path $path;
+    /** @var Storage */
+    protected Storage $path;
 
     /**
-     * @param Path $path
+     * @param Storage $path
      */
-    public function __construct(Path $path)
+    public function __construct(Storage $path)
     {
         $this->path = $path;
     }

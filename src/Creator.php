@@ -12,8 +12,15 @@ use Sciarcinski\LaravelSwagger\Processes\RouteProcess;
 
 class Creator
 {
+    use EmitTransformer;
+
     /** @var array */
-    protected array $config;
+    protected array $config = [
+        'key' => 'api',
+        'default_security' => [],
+        'path_routes' => null,
+        'creators' => [],
+    ];
 
     /** @var RouteCollection */
     protected RouteCollection $routes;
@@ -36,7 +43,7 @@ class Creator
      */
     public function __construct(array $config, RouteCollection $routes, string $apiKey, string $route, bool $resource = false)
     {
-        $this->config = $config;
+        $this->config = array_merge($this->config, $config);
         $this->routes = $routes;
         $this->apiKey = $apiKey;
         $this->route = $route;
@@ -115,7 +122,10 @@ class Creator
                 $data['merge']['parameters'] = $parameters;
             }
 
-            file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            $storage = new Storage($data, $route->getActionMethod(), '/' . $route->uri());
+            $this->emitTransformers($storage, $this->config('creators'));
+
+            file_put_contents($file, json_encode($storage->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         }
 
         return $file;

@@ -19,6 +19,8 @@ class MakeCommand extends Command
     protected $description = 'Create a new documentation file';
 
     /**
+     * @throws \ReflectionException
+     *
      * @return int
      */
     public function handle(): int

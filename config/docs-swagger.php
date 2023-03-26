@@ -25,6 +25,7 @@ return [
                 //'users.destroy',
             ],
             'generators' => [],
+            'creators' => [],
         ],
     ],
 ];

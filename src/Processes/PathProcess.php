@@ -3,12 +3,12 @@
 namespace Sciarcinski\LaravelSwagger\Processes;
 
 use Illuminate\Support\Arr;
-use Sciarcinski\LaravelSwagger\Path;
+use Sciarcinski\LaravelSwagger\Storage;
 
 class PathProcess
 {
-    /** @var Path */
-    protected Path $path;
+    /** @var Storage */
+    protected Storage $storage;
 
     /** @var RouteProcess */
     protected RouteProcess $route;
@@ -22,11 +22,11 @@ class PathProcess
     }
 
     /**
-     * @return Path
+     * @return Storage
      */
-    public function getPath(): Path
+    public function getStorage(): Storage
     {
-        return $this->path;
+        return $this->storage;
     }
 
     /**
@@ -81,7 +81,7 @@ class PathProcess
             $data = $this->transformMerge($data, $this->route->getMerge());
         }
 
-        $this->path = new Path($data, $this->getMethod(), $this->getUrl());
+        $this->storage = new Storage($data, $this->getMethod(), $this->getUrl());
 
         return $this;
     }

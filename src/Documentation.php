@@ -59,7 +59,7 @@ class Documentation
         if (! empty($this->paths)) {
             $doc['paths'] = [];
 
-            /** @var Path $path */
+            /** @var Storage $path */
             foreach ($this->paths as $path) {
                 $doc['paths'][$path->url][$path->method] = $path->data;
             }
@@ -145,10 +145,10 @@ class Documentation
     }
 
     /**
-     * @param Path $path
+     * @param Storage $path
      * @return $this
      */
-    public function setPath(Path $path): static
+    public function setPath(Storage $path): static
     {
         $this->paths[] = $path;
 

@@ -13,6 +13,8 @@ use Sciarcinski\LaravelSwagger\Processes\RouteProcess;
 
 class Generator extends EventEmitter
 {
+    use EmitTransformer;
+
     /** @var array */
     protected array $config = [
         'key' => 'api',
@@ -109,15 +111,15 @@ class Generator extends EventEmitter
             $route = new RouteProcess($this->routes->getByName($name), $path . $this->transformFileName($name) . '.json');
             $route->process();
 
-            $routePath = (new PathProcess($route))
+            $storage = (new PathProcess($route))
                 ->process()
-                ->getPath();
+                ->getStorage();
 
-            $this->generators($routePath);
+            $this->emitTransformers($storage, $this->config('generators'));
             $this->emit('progress', [$name, $route]);
 
             $this->doc->setTags($route->getTags());
-            $this->doc->setPath($routePath);
+            $this->doc->setPath($storage);
         }
     }
 
@@ -128,23 +130,5 @@ class Generator extends EventEmitter
     protected function transformFileName(string $name): string
     {
         return Str::slug(Str::replace('.', '_', $name), '_');
-    }
-
-    /**
-     * @param Path $path
-     * @return void
-     */
-    protected function generators(Path $path): void
-    {
-        array_map(fn ($generator) => $this->generator(new $generator($path)), $this->config('generators'));
-    }
-
-    /**
-     * @param GeneratorContract $generator
-     * @return void
-     */
-    protected function generator(GeneratorContract $generator): void
-    {
-        $generator->handle();
     }
 }
