@@ -68,10 +68,7 @@ class PathProcess
                 'required' => true,
                 'content' => [
                     'application/json' => [
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => $requestBody,
-                        ],
+                        'schema' => $requestBody,
                     ],
                 ],
             ];

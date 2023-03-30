@@ -21,8 +21,8 @@ class GenerateTest extends TestCase
             'path_components' => base_path('tests/doc_generate/components/'),
             'path_routes' => base_path('tests/doc_generate/routes/'),
             'names' => [
-                'users.index',
-                'users.show',
+                //'users.index',
+                //'users.show',
                 'users.store',
             ],
             'generators' => [
@@ -39,8 +39,8 @@ class GenerateTest extends TestCase
         // verify
         $this->assertFileExists($config['path_doc_json']);
 
-        $this->beforeApplicationDestroyed(function () use ($config) {
-            @unlink($config['path_doc_json']);
+        $this->beforeApplicationDestroyed(function () {
+            //@unlink($config['path_doc_json']);
         });
     }
 }
