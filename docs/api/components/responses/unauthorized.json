@@ -5,7 +5,7 @@
             "example": {
                 "code": "AuthenticationException",
                 "message": "Unauthenticated.",
-                "errors": null
+                "errors": []
             }
         }
     }

@@ -2,61 +2,37 @@
 
 namespace Sciarcinski\LaravelSwagger\Console;
 
-use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Routing\RouteCollection;
-use Illuminate\Support\Arr;
-use Sciarcinski\LaravelSwagger\Creator;
-use Throwable;
+use Sciarcinski\LaravelSwagger\DocumentationCreator;
 
 class MakeCommand extends Command
 {
     /** @var string */
     protected $signature = 'make:documentation
-        {apiKey : API key}
-        {route : Route name}
-        {--resource : Resource controller}';
+        {documentation : Create a new documentation file}
+        {route : Create a new documentation file}
+        {--resource : Create new documentation files}';
 
     /** @var string */
     protected $description = 'Create a new documentation file';
 
     /**
-     * @return int
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     *
+     * @return void
      */
-    public function handle(): int
+    public function handle()
     {
-        try {
-            $apiKey = $this->argument('apiKey');
-            $config = Arr::first(config('docs-swagger.documentations', []), function ($doc) use ($apiKey) {
-                return $doc['key'] === $apiKey;
-            });
+        $creator = app()->make(DocumentationCreator::class);
+        $creator->setDocKey($this->argument('documentation'));
 
-            if (empty($config)) {
-                throw new Exception('No configuration for API key: ' . $apiKey);
-            }
+        $routes = $creator->create(
+            (string) $this->argument('route'),
+            (bool) $this->option('resource')
+        );
 
-            /** @var RouteCollection $routes */
-            $routes = app('router')->getRoutes();
-
-            $creator = new Creator(
-                $config,
-                $routes,
-                $this->argument('apiKey'),
-                $this->argument('route'),
-                (bool) $this->option('resource')
-            );
-
-            $routes = $creator->create();
-
-            foreach ($routes as $route) {
-                $this->info('\'' . $route . '\',');
-            }
-
-            return 0;
-        } catch (Throwable $e) {
-            $this->error($e->getMessage());
-
-            return 1;
+        foreach ($routes as $route) {
+            $this->info('\'' . $route . '\',');
         }
     }
 }

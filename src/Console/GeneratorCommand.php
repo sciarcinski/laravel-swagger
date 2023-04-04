@@ -3,10 +3,7 @@
 namespace Sciarcinski\LaravelSwagger\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Routing\RouteCollection;
-use ReflectionException;
-use Sciarcinski\LaravelSwagger\Documentation;
-use Sciarcinski\LaravelSwagger\Generator;
+use Sciarcinski\LaravelSwagger\DocumentationGenerator;
 
 class GeneratorCommand extends Command
 {
@@ -17,27 +14,24 @@ class GeneratorCommand extends Command
     protected $description = 'Documentation generator';
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      *
      * @return void
      */
     public function handle(): void
     {
         $documentations = config('docs-swagger.documentations', []);
+        $generator = new DocumentationGenerator;
 
-        /** @var RouteCollection $routes */
-        $routes = app('router')->getRoutes();
-
-        foreach ($documentations as $documentation) {
-            $this->info(date('Y-m-d H:i:s') . ' [' . $documentation['key'] . '] Documentation generator started');
+        foreach ($documentations as $docKey => $documentation) {
+            $this->info(date('Y-m-d H:i:s') . ' [' . $docKey . '] Documentation generator started');
             $this->line('');
 
             $bar = null;
-            $count = count($documentation['names']);
+            $routes = count($documentation['routes']);
 
-            $generator = new Generator($documentation, $routes, new Documentation());
-            $generator->once('start', function () use (&$bar, $count) {
-                $bar = $this->output->createProgressBar($count);
+            $generator->once('start', function () use (&$bar, $routes) {
+                $bar = $this->output->createProgressBar($routes);
             });
             $generator->once('progress', function () use (&$bar) {
                 $bar->advance();
@@ -45,11 +39,13 @@ class GeneratorCommand extends Command
             $generator->once('finish', function () use (&$bar) {
                 $bar->finish();
             });
-            $generator->process();
+
+            $generator->setDocKey($docKey);
+            $generator->generate($documentation);
 
             $this->line('');
             $this->line('');
-            $this->info(date('Y-m-d H:i:s') . ' [' . $documentation['key'] . '] Documentation generator ended');
+            $this->info(date('Y-m-d H:i:s') . ' [' . $docKey . '] Documentation generator ended');
         }
     }
 }

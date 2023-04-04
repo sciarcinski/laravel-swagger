@@ -5,7 +5,7 @@
             "example": {
                 "code": "NotFoundHttpException",
                 "message": "No query results",
-                "errors": null
+                "errors": []
             }
         }
     }

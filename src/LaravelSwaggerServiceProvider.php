@@ -13,7 +13,7 @@ class LaravelSwaggerServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/docs-swagger.php' => config_path('docs-swagger.php'),
+                __DIR__ . '../config/docs-swagger.php' => config_path('docs-swagger.php'),
             ], 'config');
         }
     }
@@ -29,7 +29,5 @@ class LaravelSwaggerServiceProvider extends ServiceProvider
                 Console\GeneratorCommand::class,
             ]);
         }
-
-        $this->mergeConfigFrom(__DIR__ . '/../config/docs-swagger.php', 'docs-swagger');
     }
 }

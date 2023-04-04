@@ -5,7 +5,7 @@
             "example": {
                 "code": "ValidationException",
                 "message": "The name field is required.",
-                "errors": null
+                "errors": []
             }
         }
     }
