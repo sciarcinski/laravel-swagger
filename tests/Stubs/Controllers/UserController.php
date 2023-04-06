@@ -38,7 +38,7 @@ class UserController extends Controller
      * @param UserRequest $request
      * @return true
      */
-    public function update(int $id, UserRequest $request): bool
+    public function update($id, UserRequest $request): bool
     {
         return true;
     }

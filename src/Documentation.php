@@ -2,6 +2,8 @@
 
 namespace Sciarcinski\LaravelSwagger;
 
+use Sciarcinski\LaravelSwagger\Generator\Data;
+
 class Documentation
 {
     /** @var string */
@@ -26,10 +28,9 @@ class Documentation
     protected array $paths = [];
 
     /**
-     * @param string $pathDocJson
-     * @return true
+     * @return array
      */
-    public function save(string $pathDocJson): bool
+    public function toArray(): array
     {
         $doc = [
             'openapi' => '3.0.0',
@@ -59,9 +60,9 @@ class Documentation
         if (! empty($this->paths)) {
             $doc['paths'] = [];
 
-            /** @var Storage $path */
+            /** @var Data $path */
             foreach ($this->paths as $path) {
-                $doc['paths'][$path->url][$path->method] = $path->data;
+                $doc['paths'][$path->url][$path->method] = $path->items;
             }
         }
 
@@ -69,7 +70,24 @@ class Documentation
             $doc['components'] = $this->components;
         }
 
-        file_put_contents($pathDocJson, json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        return $doc;
+    }
+
+    /**
+     * @return string
+     */
+    public function toJson(): string
+    {
+        return json_encode($this->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param string $pathDocJson
+     * @return true
+     */
+    public function save(string $pathDocJson): bool
+    {
+        file_put_contents($pathDocJson, $this->toJson());
 
         return true;
     }
@@ -145,12 +163,12 @@ class Documentation
     }
 
     /**
-     * @param Storage $path
+     * @param Data $data
      * @return $this
      */
-    public function setPath(Storage $path): static
+    public function setPath(Data $data): static
     {
-        $this->paths[] = $path;
+        $this->paths[] = $data;
 
         return $this;
     }

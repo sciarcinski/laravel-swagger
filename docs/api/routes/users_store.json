@@ -2,27 +2,14 @@
   "tags": [
     "Users"
   ],
-  "summary": "Get user",
+  "summary": "Add user",
   "description": null,
-  "operationId": "api.users.show",
+  "operationId": "api.users.store",
   "security": [
     "BearerAuth"
   ],
-  "merge": {
-    "parameters": [
-      {
-        "in": "path",
-        "name": "user",
-        "required": true,
-        "description": "user",
-        "schema": {
-          "type": "integer"
-        }
-      }
-    ]
-  },
   "responses": {
-    "200": {
+    "201": {
       "description": "Successful response",
       "content": {
         "application\/json": {
@@ -37,7 +24,7 @@
         }
       }
     },
-    "401": "#/components/responses/unauthorized",
-    "404": "#/components/responses/not_found_http"
+    "401": "#\/components\/responses\/unauthorized",
+    "422": "#\/components\/responses\/invalidation"
   }
 }

@@ -1,0 +1,29 @@
+{
+  "tags": [
+    "Users"
+  ],
+  "summary": "Delete user",
+  "description": null,
+  "operationId": "api.users.destroy",
+  "security": [
+    "BearerAuth"
+  ],
+  "merge": {
+    "parameters": [
+      {
+        "in": "path",
+        "name": "user",
+        "required": true,
+        "description": "user",
+        "schema": {
+          "type": "integer"
+        }
+      }
+    ]
+  },
+  "responses": {
+    "204": "#/components/responses/no_content",
+    "401": "#/components/responses/unauthorized",
+    "404": "#/components/responses/not_found_http"
+  }
+}

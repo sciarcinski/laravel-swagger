@@ -1,16 +1,16 @@
 <?php
 
-namespace Sciarcinski\LaravelSwagger\Processes;
+namespace Sciarcinski\LaravelSwagger\Generator;
 
 use Illuminate\Support\Arr;
 
-class RuleProcess
+class Rule
 {
     /** @var string */
-    protected string $rule;
+    protected string $key;
 
-    /** @var RuleProcess|null */
-    protected ?RuleProcess $parent;
+    /** @var Rule|null */
+    protected ?Rule $parent;
 
     /** @var array */
     protected array $values = [];
@@ -18,8 +18,8 @@ class RuleProcess
     /** @var string */
     protected string $type;
 
-    /** @var array|null */
-    protected ?array $required;
+    /** @var array */
+    protected array $required = [];
 
     /** @var array|null */
     protected ?array $children;
@@ -31,13 +31,29 @@ class RuleProcess
     protected string $itemsType = 'string';
 
     /**
-     * @param string $rule
-     * @param RuleProcess|null $parent
+     * @param string $key
+     * @param Rule|null $parent
      */
-    public function __construct(string $rule, RuleProcess $parent = null)
+    public function __construct(string $key, Rule $parent = null)
     {
-        $this->rule = $rule;
+        $this->key = $key;
         $this->parent = $parent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getNullable(): bool
+    {
+        return $this->nullable;
     }
 
     /**
@@ -49,6 +65,22 @@ class RuleProcess
     }
 
     /**
+     * @return array
+     */
+    public function getRequired(): array
+    {
+        return $this->required;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChildren(): bool
+    {
+        return ! empty($this->children);
+    }
+
+    /**
      * @param array $values
      * @return $this
      */
@@ -56,7 +88,7 @@ class RuleProcess
     {
         if (in_array('required', $values)) {
             $values = array_values(array_diff($values, ['required']));
-            $this->parent?->setRequired($this->rule);
+            $this->parent?->setRequired($this->key);
         }
 
         if (in_array('nullable', $values)) {
@@ -94,12 +126,10 @@ class RuleProcess
      */
     public function setRequired(string $rule): static
     {
-        if ($rule !== '*') {
-            $this->required[] = $rule;
-            $this->required = array_unique($this->required);
-        }
+        $this->required[] = $rule === '*' ? $this->getKey() : $rule;
+        $this->required = array_unique($this->required);
 
-        $this->parent?->setRequired($this->rule);
+        $this->parent?->setRequired($this->key);
 
         return $this;
     }
@@ -134,5 +164,37 @@ class RuleProcess
         }
 
         return 'string';
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        $data = [
+            'type' => $this->getType(),
+            'nullable' => $this->getNullable(),
+        ];
+
+        if ($data['type'] === 'array') {
+            $data['items'] = [
+                'type' => $this->itemsType,
+            ];
+        }
+
+        if (! empty($this->children)) {
+            $data['properties'] = [];
+
+            /** @var Rule $child */
+            foreach ($this->children as $child) {
+                $data['properties'][$child->getKey()] = $child->toArray();
+            }
+
+            if (! empty($this->getRequired())) {
+                $data['required'] = $this->getRequired();
+            }
+        }
+
+        return $data;
     }
 }

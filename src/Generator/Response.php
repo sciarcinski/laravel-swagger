@@ -1,10 +1,10 @@
 <?php
 
-namespace Sciarcinski\LaravelSwagger\Processes;
+namespace Sciarcinski\LaravelSwagger\Generator;
 
 use Illuminate\Support\Arr;
 
-class ResponseProcess
+class Response
 {
     /** @var string */
     protected string $code;

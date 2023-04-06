@@ -2,9 +2,9 @@
   "tags": [
     "Users"
   ],
-  "summary": "Get user",
+  "summary": "Update user",
   "description": null,
-  "operationId": "api.users.show",
+  "operationId": "api.users.update",
   "security": [
     "BearerAuth"
   ],
@@ -38,6 +38,7 @@
       }
     },
     "401": "#/components/responses/unauthorized",
-    "404": "#/components/responses/not_found_http"
+    "404": "#/components/responses/not_found_http",
+    "422": "#/components/responses/invalidation"
   }
 }

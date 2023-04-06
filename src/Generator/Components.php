@@ -1,10 +1,10 @@
 <?php
 
-namespace Sciarcinski\LaravelSwagger\Processes;
+namespace Sciarcinski\LaravelSwagger\Generator;
 
 use Illuminate\Support\Arr;
 
-class ComponentsProcess
+class Components
 {
     /**
      * @param string $path
@@ -38,9 +38,6 @@ class ComponentsProcess
      */
     protected function loadFile(string $path): array
     {
-        $data = file_get_contents($path);
-        $data = json_decode($data, true);
-
-        return $data;
+        return json_decode(file_get_contents($path), true);
     }
 }

@@ -2,17 +2,17 @@
 
 namespace Tests\Stubs\Generators;
 
-use Sciarcinski\LaravelSwagger\Storage;
+use Sciarcinski\LaravelSwagger\Generator\Data;
 
 class GenerateTest
 {
-    /** @var Storage */
-    protected Storage $path;
+    /** @var Data */
+    protected Data $path;
 
     /**
-     * @param Storage $path
+     * @param Data $path
      */
-    public function __construct(Storage $path)
+    public function __construct(Data $path)
     {
         $this->path = $path;
     }
