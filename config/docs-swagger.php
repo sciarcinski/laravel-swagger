@@ -2,9 +2,9 @@
 
 /**
  * php artisan route:list --name=api
- * php artisan make:documentation {api_key} {route_name}
- * php artisan make:documentation {api_key} {route_group_name} --resource
- * php artisan documentation:generator
+ * php artisan make:doc {key} {route_name}
+ * php artisan make:doc {key} {route_group_name} --resource
+ * php artisan doc:generate {documentation?}
  */
 return [
     'documentations' => [

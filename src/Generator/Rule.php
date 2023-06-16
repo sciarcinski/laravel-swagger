@@ -3,6 +3,7 @@
 namespace Sciarcinski\LaravelSwagger\Generator;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class Rule
 {
@@ -29,6 +30,9 @@ class Rule
 
     /** @var string */
     protected string $itemsType = 'string';
+
+    /** @var array */
+    protected array $itemsEnum = [];
 
     /**
      * @param string $key
@@ -97,6 +101,7 @@ class Rule
 
         $this->values = $values;
         $this->type = static::determineType($values);
+        $this->itemsEnum = $this->resolveItemsEnum($values);
 
         return $this;
     }
@@ -167,6 +172,28 @@ class Rule
     }
 
     /**
+     * @param array $values
+     * @return array
+     */
+    protected function resolveItemsEnum(array $values): array
+    {
+        foreach ($values as $value) {
+            if (! is_string($value)) {
+                $value = (string) $value;
+            }
+
+            if (Str::startsWith($value, 'in:')) {
+                $value = explode(',', substr($value, 3));
+                $value = array_map(fn ($val) => trim($val, '"'), $value);
+
+                return $value;
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
@@ -182,6 +209,10 @@ class Rule
             ];
         }
 
+        if (! empty($this->itemsEnum)) {
+            $data['enum'] = $this->itemsEnum;
+        }
+
         if (! empty($this->children)) {
             $data['properties'] = [];
 
@@ -194,7 +225,7 @@ class Rule
                 $data['required'] = $this->getRequired();
             }
         }
-
+        //dd($this);
         return $data;
     }
 }

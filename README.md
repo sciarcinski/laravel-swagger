@@ -14,5 +14,11 @@ in console to install this module
 To get started run:
 
 ```php
-php artisan make:documentation {api_key} {route_name}
+php artisan make:doc {key} {route_name}
+```
+
+Generating documentation:
+
+```php
+php artisan doc:generate
 ```

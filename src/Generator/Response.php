@@ -65,10 +65,6 @@ class Response
         $content = [];
 
         foreach ($items as $key => $item) {
-            if (! is_string($key)) {
-                $key = 'application/json';
-            }
-
             $content[$key] = $item;
         }
 

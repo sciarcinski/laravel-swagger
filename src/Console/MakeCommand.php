@@ -12,8 +12,8 @@ use Throwable;
 class MakeCommand extends Command
 {
     /** @var string */
-    protected $signature = 'make:documentation
-        {apiKey : API key}
+    protected $signature = 'make:doc
+        {docKey : Documentation key}
         {route : Route name}
         {--resource : Resource controller}';
 
@@ -26,13 +26,14 @@ class MakeCommand extends Command
     public function handle(): int
     {
         try {
-            $apiKey = $this->argument('apiKey');
-            $config = Arr::first(config('docs-swagger.documentations', []), function ($doc) use ($apiKey) {
-                return $doc['key'] === $apiKey;
+            $docKey = $this->argument('docKey');
+
+            $config = Arr::first(config('docs-swagger.documentations', []), function ($doc) use ($docKey) {
+                return $doc['key'] === $docKey;
             });
 
             if (empty($config)) {
-                throw new Exception('No configuration for API key: ' . $apiKey);
+                throw new Exception('No configuration for documentation key: ' . $docKey);
             }
 
             /** @var RouteCollection $routes */
@@ -41,7 +42,7 @@ class MakeCommand extends Command
             $creator = new Creator(
                 $config,
                 $routes,
-                $this->argument('apiKey'),
+                $this->argument('docKey'),
                 $this->argument('route'),
                 (bool) $this->option('resource')
             );

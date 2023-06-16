@@ -4,17 +4,18 @@ namespace Sciarcinski\LaravelSwagger\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Arr;
 use ReflectionException;
 use Sciarcinski\LaravelSwagger\Documentation;
 use Sciarcinski\LaravelSwagger\Generator;
 
-class GeneratorCommand extends Command
+class GenerateCommand extends Command
 {
     /** @var string */
-    protected $signature = 'documentation:generator';
+    protected $signature = 'doc:generate {--key= : Documentation key}';
 
     /** @var string */
-    protected $description = 'Documentation generator';
+    protected $description = 'Documentations generate';
 
     /**
      * @throws ReflectionException
@@ -23,19 +24,24 @@ class GeneratorCommand extends Command
      */
     public function handle(): void
     {
-        $documentations = config('docs-swagger.documentations', []);
+        $key = $this->option('key');
+        $docs = config('docs-swagger.documentations', []);
+
+        if ($key) {
+            $docs = Arr::where($docs, fn ($doc) => $doc['key'] === $key);
+        }
 
         /** @var RouteCollection $routes */
         $routes = app('router')->getRoutes();
 
-        foreach ($documentations as $documentation) {
-            $this->info(date('Y-m-d H:i:s') . ' [' . $documentation['key'] . '] Documentation generator started');
+        foreach ($docs as $doc) {
+            $this->info(date('Y-m-d H:i:s') . ' [' . $doc['key'] . '] Documentation generator started');
             $this->line('');
 
             $bar = null;
-            $count = count($documentation['names']);
+            $count = count($doc['names']);
 
-            $generator = new Generator($documentation, $routes, new Documentation());
+            $generator = new Generator($doc, $routes, new Documentation());
             $generator->once('start', function () use (&$bar, $count) {
                 $bar = $this->output->createProgressBar($count);
             });
@@ -49,7 +55,7 @@ class GeneratorCommand extends Command
 
             $this->line('');
             $this->line('');
-            $this->info(date('Y-m-d H:i:s') . ' [' . $documentation['key'] . '] Documentation generator ended');
+            $this->info(date('Y-m-d H:i:s') . ' [' . $doc['key'] . '] Documentation generator ended');
         }
     }
 }

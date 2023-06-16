@@ -30,7 +30,7 @@ class MakeCommandTest extends TestCase
         ]);
 
         // start
-        $this->artisan('make:documentation api users.show')->assertSuccessful();
+        $this->artisan('make:doc api users.show')->assertSuccessful();
 
         // verify
         $file = base_path('tests/doc_make/routes/') . 'users_show.json';
@@ -66,7 +66,7 @@ class MakeCommandTest extends TestCase
         ]);
 
         // start
-        $this->artisan('make:documentation api users.show --resource')->assertSuccessful();
+        $this->artisan('make:doc api users.show --resource')->assertSuccessful();
 
         // verify
         $index = base_path('tests/doc_make/routes/') . 'users_index.json';
@@ -114,7 +114,7 @@ class MakeCommandTest extends TestCase
         ]);
 
         // start
-        $this->artisan('make:documentation api users.ban')->assertSuccessful();
+        $this->artisan('make:doc api users.ban')->assertSuccessful();
 
         // verify
         $file = base_path('tests/doc_make/routes/') . 'users_ban.json';
@@ -134,9 +134,9 @@ class MakeCommandTest extends TestCase
         config()->set('docs-swagger', []);
 
         // start
-        $this->artisan('make:documentation api users.show')
+        $this->artisan('make:doc api users.show')
             ->assertFailed()
-            ->expectsOutput('No configuration for API key: api');
+            ->expectsOutput('No configuration for documentation key: api');
     }
 
     /**
@@ -163,7 +163,7 @@ class MakeCommandTest extends TestCase
         ]);
 
         // start
-        $this->artisan('make:documentation api users.not.exist')
+        $this->artisan('make:doc api users.not.exist')
             ->assertFailed()
             ->expectsOutput('Route name [users.not.exist] does not exist');
     }
