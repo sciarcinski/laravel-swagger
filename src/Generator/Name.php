@@ -1,6 +1,6 @@
 <?php
 
-namespace Sciarcinski\LaravelSwagger\Processes;
+namespace Sciarcinski\LaravelSwagger\Generator;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
@@ -8,7 +8,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 
-class RouteProcess
+class Name
 {
     /** @var Route */
     protected Route $route;
@@ -160,7 +160,7 @@ class RouteProcess
         $responses = [];
 
         foreach ($this->config('responses', []) as $code => $value) {
-            $response = new ResponseProcess($code, $value);
+            $response = new Response($code, $value);
             $response->process();
 
             $responses[] = $response;
@@ -179,7 +179,7 @@ class RouteProcess
         $parameters = [];
 
         foreach ($this->reflectionMethod()->getParameters() as $parameter) {
-            $parameter = new ParameterProcess($parameter);
+            $parameter = new Parameter($parameter);
             $parameter->process();
 
             $parameters[] = $parameter;

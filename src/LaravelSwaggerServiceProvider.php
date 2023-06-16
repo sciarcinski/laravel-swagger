@@ -26,7 +26,7 @@ class LaravelSwaggerServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Console\MakeCommand::class,
-                Console\GeneratorCommand::class,
+                Console\GenerateCommand::class,
             ]);
         }
 

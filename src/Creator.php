@@ -8,12 +8,13 @@ use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionException;
-use Sciarcinski\LaravelSwagger\Processes\ParameterProcess;
-use Sciarcinski\LaravelSwagger\Processes\RouteProcess;
+use Sciarcinski\LaravelSwagger\Generator\Data;
+use Sciarcinski\LaravelSwagger\Generator\Name;
+use Sciarcinski\LaravelSwagger\Generator\Parameter;
 
 class Creator
 {
-    use EmitTransformer;
+    use Module;
 
     /** @var array */
     protected array $config = [
@@ -138,10 +139,10 @@ class Creator
                 $data['merge']['parameters'] = $parameters;
             }
 
-            $storage = new Storage($data, $route->getActionMethod(), '/' . $route->uri());
-            $this->emitTransformers($storage, $this->config('creators'));
+            $storage = new Data($data, $route->getActionMethod(), '/' . $route->uri());
+            $this->module($storage, $this->config('creators'));
 
-            file_put_contents($file, json_encode($storage->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            file_put_contents($file, json_encode($storage->items, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         }
 
         return $file;
@@ -271,13 +272,13 @@ class Creator
      */
     protected function parametersRouteProcess(Route $route): array
     {
-        $process = new RouteProcess($route);
-        $process->process();
+        $name = new Name($route);
+        $name->process();
 
         $paths = [];
 
-        /** @var ParameterProcess $parameter */
-        foreach ($process->getParameters() as $parameter) {
+        /** @var Parameter $parameter */
+        foreach ($name->getParameters() as $parameter) {
             if (! empty($path = $parameter->getPath())) {
                 $paths[] = $path['type'];
             }

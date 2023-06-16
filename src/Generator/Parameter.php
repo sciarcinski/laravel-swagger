@@ -1,12 +1,12 @@
 <?php
 
-namespace Sciarcinski\LaravelSwagger\Processes;
+namespace Sciarcinski\LaravelSwagger\Generator;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionParameter;
 
-class ParameterProcess
+class Parameter
 {
     /** @var ReflectionParameter */
     protected ReflectionParameter $parameter;
@@ -59,16 +59,17 @@ class ParameterProcess
             $class = $this->parameter->getType()->getName();
 
             if (method_exists($class, 'rules')) {
-                $rules = $this->rules((new $class())->rules());
+                $root = $this->ruleRoot((new $class())->rules());
 
-                //$this->query =
-                //$this->query = $this->query((new $class())->rules());
+                if ($root->hasChildren()) {
+                    $this->query = $root->toArray();
+                }
             }
         } else {
             $this->path = [
                 'position' => $this->parameter->getPosition(),
                 'name' => $this->parameter->getName(),
-                'type' => RuleProcess::determineType([$this->type]),
+                'type' => Rule::determineType([$this->type]),
             ];
         }
 
@@ -97,9 +98,9 @@ class ParameterProcess
 
     /**
      * @param array $rules
-     * @return array
+     * @return Rule
      */
-    protected function rules(array $rules = []): array
+    protected function ruleRoot(array $rules = []): Rule
     {
         foreach ($rules as $rule => $values) {
             $rules[$rule] = [
@@ -109,22 +110,23 @@ class ParameterProcess
 
         ksort($rules);
 
-        return $this->rulesConvertToTree(
-            Arr::undot($rules)
-        );
+        $rules = Arr::undot($rules);
+        $rules = [$this->rulesKey => $rules];
+
+        return $this->rulesConvertToTree($rules)[$this->rulesKey];
     }
 
     /**
      * @param array $rules
-     * @param RuleProcess|null $parent
+     * @param Rule|null $parent
      * @return array
      */
-    protected function rulesConvertToTree(array $rules = [], RuleProcess $parent = null): array
+    protected function rulesConvertToTree(array $rules = [], Rule $parent = null): array
     {
         $items = [];
 
         foreach ($rules as $rule => $values) {
-            $item = new RuleProcess($rule, $parent);
+            $item = new Rule($rule, $parent);
 
             if (is_array($values)) {
                 if (Arr::has($values, $this->rulesKey)) {

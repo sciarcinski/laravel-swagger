@@ -1,10 +1,10 @@
 <?php
 
-namespace Sciarcinski\LaravelSwagger\Processes;
+namespace Sciarcinski\LaravelSwagger\Generator;
 
 use Illuminate\Support\Arr;
 
-class ResponseProcess
+class Response
 {
     /** @var string */
     protected string $code;
@@ -65,10 +65,6 @@ class ResponseProcess
         $content = [];
 
         foreach ($items as $key => $item) {
-            if (! is_string($key)) {
-                $key = 'application/json';
-            }
-
             $content[$key] = $item;
         }
 

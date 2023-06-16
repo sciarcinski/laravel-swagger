@@ -1,11 +1,11 @@
 <?php
 
-namespace Sciarcinski\LaravelSwagger;
+namespace Sciarcinski\LaravelSwagger\Generator;
 
-class Storage
+class Data
 {
     /** @var array */
-    public array $data;
+    public array $items;
 
     /** @var string|null */
     public ?string $method;
@@ -14,13 +14,13 @@ class Storage
     public ?string $url;
 
     /**
-     * @param array $data
+     * @param array $items
      * @param string|null $method
      * @param string|null $url
      */
-    public function __construct(array $data, string $method = null, string $url = null)
+    public function __construct(array $items, string $method = null, string $url = null)
     {
-        $this->data = $data;
+        $this->items = $items;
         $this->method = $method;
         $this->url = $url;
     }

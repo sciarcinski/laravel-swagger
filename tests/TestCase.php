@@ -34,7 +34,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function defineRoutes($router): void
     {
-        $router->put('users/{users}/ban', [\Tests\Stubs\Controllers\UserController::class, 'ban'])->name('users.ban');
+        $router->put('users/{user}/ban', [\Tests\Stubs\Controllers\UserController::class, 'ban'])->name('users.ban');
         $router->apiResource('users', \Tests\Stubs\Controllers\UserController::class);
     }
 }

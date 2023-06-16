@@ -1,32 +1,31 @@
 <?php
 
-namespace Sciarcinski\LaravelSwagger\Processes;
+namespace Sciarcinski\LaravelSwagger\Generator;
 
 use Illuminate\Support\Arr;
-use Sciarcinski\LaravelSwagger\Storage;
 
-class PathProcess
+class Path
 {
-    /** @var Storage */
-    protected Storage $storage;
+    /** @var Data */
+    protected Data $data;
 
-    /** @var RouteProcess */
-    protected RouteProcess $route;
+    /** @var Name */
+    protected Name $name;
 
     /**
-     * @param RouteProcess $route
+     * @param Name $name
      */
-    public function __construct(RouteProcess $route)
+    public function __construct(Name $name)
     {
-        $this->route = $route;
+        $this->name = $name;
     }
 
     /**
-     * @return Storage
+     * @return Data
      */
-    public function getStorage(): Storage
+    public function getData(): Data
     {
-        return $this->storage;
+        return $this->data;
     }
 
     /**
@@ -34,7 +33,7 @@ class PathProcess
      */
     public function getUrl(): string
     {
-        return '/' . $this->route->getRoute()->uri();
+        return '/' . $this->name->getRoute()->uri();
     }
 
     /**
@@ -42,7 +41,7 @@ class PathProcess
      */
     public function getMethod(): string
     {
-        return strtolower($this->route->getRoute()->methods()[0]);
+        return strtolower($this->name->getRoute()->methods()[0]);
     }
 
     /**
@@ -51,15 +50,15 @@ class PathProcess
     public function process(): static
     {
         $data = [
-            'tags' => $this->route->getTags(),
-            'summary' => $this->route->getSummary(),
-            'description' => $this->route->getDescription(),
-            'operationId' => $this->route->getOperationId(),
-            'security' => [$this->transformSecurity($this->route->getSecurity())],
+            'tags' => $this->name->getTags(),
+            'summary' => $this->name->getSummary(),
+            'description' => $this->name->getDescription(),
+            'operationId' => $this->name->getOperationId(),
+            'security' => [$this->transformSecurity($this->name->getSecurity())],
             'responses' => $this->processResponses(),
         ];
 
-        if ($this->route->isDeprecated()) {
+        if ($this->name->isDeprecated()) {
             $data['deprecated'] = true;
         }
 
@@ -74,11 +73,11 @@ class PathProcess
             ];
         }
 
-        if ($this->route->isMerge()) {
-            $data = $this->transformMerge($data, $this->route->getMerge());
+        if ($this->name->isMerge()) {
+            $data = $this->transformMerge($data, $this->name->getMerge());
         }
 
-        $this->storage = new Storage($data, $this->getMethod(), $this->getUrl());
+        $this->data = new Data($data, $this->getMethod(), $this->getUrl());
 
         return $this;
     }
@@ -129,8 +128,8 @@ class PathProcess
     {
         $responses = [];
 
-        /** @var ResponseProcess $response */
-        foreach ($this->route->getResponses() as $response) {
+        /** @var Response $response */
+        foreach ($this->name->getResponses() as $response) {
             $responses[$response->getCode()] = $response->getResponse();
         }
 
@@ -142,11 +141,11 @@ class PathProcess
      */
     protected function processRequestBody(): array
     {
-        $parameters = $this->route->getParameters();
+        $parameters = $this->name->getParameters();
 
         $query = [];
 
-        /** @var ParameterProcess $parameter */
+        /** @var Parameter $parameter */
         foreach ($parameters as $parameter) {
             $query = array_merge($query, $parameter->getQuery());
         }

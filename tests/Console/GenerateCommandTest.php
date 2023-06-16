@@ -4,7 +4,7 @@ namespace Tests\Console;
 
 use Tests\TestCase;
 
-class GeneratorCommandTest extends TestCase
+class GenerateCommandTest extends TestCase
 {
     /**
      * @test
@@ -29,7 +29,7 @@ class GeneratorCommandTest extends TestCase
             ],
         ]);
 
-        $this->artisan('documentation:generator');
+        $this->artisan('doc:generate', ['--key' => 'api']);
 
         // verify
         $this->assertFileExists(base_path('tests/doc_generate/api.json'));

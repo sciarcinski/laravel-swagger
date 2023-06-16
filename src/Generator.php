@@ -7,13 +7,13 @@ use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionException;
-use Sciarcinski\LaravelSwagger\Processes\ComponentsProcess;
-use Sciarcinski\LaravelSwagger\Processes\PathProcess;
-use Sciarcinski\LaravelSwagger\Processes\RouteProcess;
+use Sciarcinski\LaravelSwagger\Generator\Components;
+use Sciarcinski\LaravelSwagger\Generator\Name;
+use Sciarcinski\LaravelSwagger\Generator\Path;
 
 class Generator extends EventEmitter
 {
-    use EmitTransformer;
+    use Module;
 
     /** @var array */
     protected array $config = [
@@ -88,7 +88,7 @@ class Generator extends EventEmitter
         $path = Str::finish($this->config('path_components'), '/');
 
         if ($path && is_dir($path)) {
-            $components = (new ComponentsProcess())->process($path);
+            $components = (new Components())->process($path);
             $this->emit('components', [&$components]);
         }
 
@@ -108,18 +108,18 @@ class Generator extends EventEmitter
         $names = $this->config('names');
 
         foreach ($names as $name) {
-            $route = new RouteProcess($this->routes->getByName($name), $path . $this->transformFileName($name) . '.json');
-            $route->process();
+            $name = new Name($this->routes->getByName($name), $path . $this->transformFileName($name) . '.json');
+            $name->process();
 
-            $storage = (new PathProcess($route))
+            $data = (new Path($name))
                 ->process()
-                ->getStorage();
+                ->getData();
 
-            $this->emitTransformers($storage, $this->config('generators'));
-            $this->emit('progress', [$name, $route]);
+            $this->module($data, $this->config('generators'));
+            $this->emit('progress', [$name, $name]);
 
-            $this->doc->setTags($route->getTags());
-            $this->doc->setPath($storage);
+            $this->doc->setTags($name->getTags());
+            $this->doc->setPath($data);
         }
     }
 
