@@ -41,7 +41,7 @@ class DocumentationGenerator extends EventEmitter
             'openapi' => '3.0.0',
             'info' => [
                 'title' => Arr::get($config, 'title', 'REST API'),
-                'version' => '1.0.0',
+                'version' => Arr::get($config, 'paths.version', '1.0.0'),
             ],
             'tags' => $tags,
             'paths' => $paths,
