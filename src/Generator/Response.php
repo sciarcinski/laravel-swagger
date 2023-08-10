@@ -50,6 +50,10 @@ class Response
             $this->response = [
                 '$ref' => $this->data,
             ];
+        } elseif (Arr::has($this->data, '$ref')) {
+            $this->response = [
+                '$ref' => $this->data['$ref'],
+            ];
         } else {
             $this->response['description'] = Arr::get($this->data, 'description', '');
             $this->response['content'] = $this->processContent(Arr::get($this->data, 'content', []));

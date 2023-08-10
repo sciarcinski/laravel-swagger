@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Sciarcinski\LaravelSwagger\Tests;
 
 use Illuminate\Routing\RouteCollection;
 use Sciarcinski\LaravelSwagger\Documentation;
@@ -29,7 +29,7 @@ class GenerateTest extends TestCase
                 'users.ban',
             ],
             'generators' => [
-                \Tests\Stubs\Generators\GenerateTest::class,
+                \Sciarcinski\LaravelSwagger\Tests\Stubs\Generators\TestGenerator::class,
             ],
         ];
 

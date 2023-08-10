@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Sciarcinski\LaravelSwagger\Tests;
 
 use Illuminate\Support\Str;
 use Sciarcinski\LaravelSwagger\Documentation;

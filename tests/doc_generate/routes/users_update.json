@@ -37,7 +37,9 @@
         }
       }
     },
-    "401": "#/components/responses/unauthorized",
+    "401": {
+      "$ref": "#/components/responses/unauthorized"
+    },
     "404": "#/components/responses/not_found_http",
     "422": "#/components/responses/invalidation"
   }

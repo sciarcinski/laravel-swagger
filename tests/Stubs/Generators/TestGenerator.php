@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Stubs\Generators;
+namespace Sciarcinski\LaravelSwagger\Tests\Stubs\Generators;
 
 use Sciarcinski\LaravelSwagger\Generator\Data;
 
-class GenerateTest
+class TestGenerator
 {
     /** @var Data */
     protected Data $path;

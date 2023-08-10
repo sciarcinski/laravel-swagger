@@ -1,12 +1,13 @@
 <?php
 
-namespace Tests;
+namespace Sciarcinski\LaravelSwagger\Tests;
 
 use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Sciarcinski\LaravelSwagger\LaravelSwaggerServiceProvider;
+use Sciarcinski\LaravelSwagger\Tests\Stubs\Controllers\UserController;
 
-abstract class TestCase extends BaseTestCase
+class TestCase extends BaseTestCase
 {
     /**
      * @param Application $app
@@ -34,7 +35,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function defineRoutes($router): void
     {
-        $router->put('users/{user}/ban', [\Tests\Stubs\Controllers\UserController::class, 'ban'])->name('users.ban');
-        $router->apiResource('users', \Tests\Stubs\Controllers\UserController::class);
+        $router->put('users/{user}/ban', [UserController::class, 'ban'])->name('users.ban');
+        $router->apiResource('users', UserController::class);
     }
 }

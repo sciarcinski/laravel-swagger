@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Stubs\Controllers;
+namespace Sciarcinski\LaravelSwagger\Tests\Stubs\Controllers;
 
 use Illuminate\Routing\Controller;
-use Tests\Stubs\Requests\UserRequest;
+use Sciarcinski\LaravelSwagger\Tests\Stubs\Requests\UserRequest;
 
 class UserController extends Controller
 {

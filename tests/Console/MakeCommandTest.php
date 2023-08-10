@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Console;
+namespace Sciarcinski\LaravelSwagger\Tests\Console;
 
-use Tests\TestCase;
+use Sciarcinski\LaravelSwagger\Tests\TestCase;
 
 class MakeCommandTest extends TestCase
 {
