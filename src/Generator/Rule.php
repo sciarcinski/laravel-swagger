@@ -85,11 +85,15 @@ class Rule
     }
 
     /**
-     * @param array $values
+     * @param array|string $values
      * @return $this
      */
-    public function setValues(array $values): static
+    public function setValues(array|string $values): static
     {
+        if (! is_array($values)) {
+            $values = explode('|', $values);
+        }
+
         if (in_array('required', $values)) {
             $values = array_values(array_diff($values, ['required']));
             $this->parent?->setRequired($this->key);

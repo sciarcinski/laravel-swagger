@@ -19,7 +19,7 @@ class UserRequest extends FormRequest
             'password' => ['nullable', 'string'],
             'test1.test2.test3.test4_1' => ['required', 'numeric'],
             'test1.test2.test3.test4_2.test5' => ['required', 'numeric'],
-            'test1.test2.test3.test4_3.*' => ['required', 'numeric'],
+            'test1.test2.test3.test4_3.*' => 'required|numeric',
             'test1.test2.test3.test4_4' => ['nullable'],
             'type' => ['required', Rule::in(['test1', 'test2'])],
         ];
