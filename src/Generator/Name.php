@@ -51,12 +51,16 @@ class Name
     }
 
     /**
-     * @param string $key
+     * @param string|null $key
      * @param mixed $default
      * @return mixed
      */
-    public function config(string $key, mixed $default = null): mixed
+    public function config(string $key = null, mixed $default = null): mixed
     {
+        if (is_null($key)) {
+            return $this->config;
+        }
+
         return Arr::get($this->config, $key, $default);
     }
 

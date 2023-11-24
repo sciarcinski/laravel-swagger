@@ -29,6 +29,16 @@ class Path
     }
 
     /**
+     * @param string|null $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function getConfig(string $key = null, mixed $default = null): mixed
+    {
+        return $this->name->config($key, $default);
+    }
+
+    /**
      * @return string
      */
     public function getUrl(): string
@@ -77,7 +87,7 @@ class Path
             $data = $this->transformMerge($data, $this->name->getMerge());
         }
 
-        $this->data = new Data($data, $this->getMethod(), $this->getUrl());
+        $this->data = new Data($data, $this->getMethod(), $this->getUrl(), $this->getConfig());
 
         return $this;
     }
