@@ -6,10 +6,7 @@ use Sciarcinski\LaravelSwagger\Tests\TestCase;
 
 class MakeCommandTest extends TestCase
 {
-    /**
-     * @return void
-     */
-    public function test_valid(): void
+    public function test_valid()
     {
         config()->set('docs-swagger', [
             'documentations' => [
@@ -42,10 +39,7 @@ class MakeCommandTest extends TestCase
         });
     }
 
-    /**
-     * @return void
-     */
-    public function test_valid_resource(): void
+    public function test_valid_resource()
     {
         config()->set('docs-swagger', [
             'documentations' => [
@@ -90,10 +84,7 @@ class MakeCommandTest extends TestCase
         });
     }
 
-    /**
-     * @return void
-     */
-    public function test_valid_route_ban(): void
+    public function test_valid_route_ban()
     {
         config()->set('docs-swagger', [
             'documentations' => [
@@ -126,10 +117,7 @@ class MakeCommandTest extends TestCase
         });
     }
 
-    /**
-     * @return void
-     */
-    public function test_fails_no_configuration(): void
+    public function test_fails_no_configuration()
     {
         config()->set('docs-swagger', []);
 
@@ -139,10 +127,7 @@ class MakeCommandTest extends TestCase
             ->expectsOutput('No configuration for documentation key: api');
     }
 
-    /**
-     * @return void
-     */
-    public function test_fails_route_does_not_exist(): void
+    public function test_fails_route_does_not_exist()
     {
         config()->set('docs-swagger', [
             'documentations' => [

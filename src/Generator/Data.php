@@ -9,6 +9,5 @@ class Data
         public ?string $method = null,
         public ?string $url = null,
         public array $config = []
-    ) {
-    }
+    ) {}
 }

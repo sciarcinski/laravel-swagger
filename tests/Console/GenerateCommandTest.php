@@ -6,10 +6,7 @@ use Sciarcinski\LaravelSwagger\Tests\TestCase;
 
 class GenerateCommandTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function valid()
+    public function test_valid()
     {
         config()->set('docs-swagger', [
             'documentations' => [

@@ -56,7 +56,10 @@ class Response
             ];
         } else {
             $this->response['description'] = Arr::get($this->data, 'description', '');
-            $this->response['content'] = $this->processContent(Arr::get($this->data, 'content', []));
+
+            if ($content = $this->processContent(Arr::get($this->data, 'content', []))) {
+                $this->response['content'] = $content;
+            }
         }
     }
 

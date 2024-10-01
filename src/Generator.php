@@ -88,7 +88,7 @@ class Generator extends EventEmitter
         $path = Str::finish($this->config('path_components'), '/');
 
         if ($path && is_dir($path)) {
-            $components = (new Components())->process($path);
+            $components = (new Components)->process($path);
             $this->emit('components', [&$components]);
         }
 

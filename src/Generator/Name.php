@@ -29,7 +29,7 @@ class Name
      * @param Route $route
      * @param string|null $path
      */
-    public function __construct(Route $route, string $path = null)
+    public function __construct(Route $route, ?string $path = null)
     {
         $this->route = $route;
         $this->path = $path;
@@ -55,7 +55,7 @@ class Name
      * @param mixed $default
      * @return mixed
      */
-    public function config(string $key = null, mixed $default = null): mixed
+    public function config(?string $key = null, mixed $default = null): mixed
     {
         if (is_null($key)) {
             return $this->config;

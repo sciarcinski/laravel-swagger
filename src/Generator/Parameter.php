@@ -59,7 +59,7 @@ class Parameter
             $class = $this->parameter->getType()->getName();
 
             if (method_exists($class, 'rules')) {
-                $root = $this->ruleRoot((new $class())->rules());
+                $root = $this->ruleRoot((new $class)->rules());
 
                 if ($root->hasChildren()) {
                     $this->query = $root->toArray();
@@ -121,7 +121,7 @@ class Parameter
      * @param Rule|null $parent
      * @return array
      */
-    protected function rulesConvertToTree(array $rules = [], Rule $parent = null): array
+    protected function rulesConvertToTree(array $rules = [], ?Rule $parent = null): array
     {
         $items = [];
 

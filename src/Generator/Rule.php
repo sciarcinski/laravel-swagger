@@ -38,7 +38,7 @@ class Rule
      * @param string $key
      * @param Rule|null $parent
      */
-    public function __construct(string $key, Rule $parent = null)
+    public function __construct(string $key, ?Rule $parent = null)
     {
         $this->key = $key;
         $this->parent = $parent;
@@ -229,6 +229,7 @@ class Rule
                 $data['required'] = $this->getRequired();
             }
         }
+
         //dd($this);
         return $data;
     }

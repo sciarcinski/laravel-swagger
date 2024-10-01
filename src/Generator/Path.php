@@ -33,7 +33,7 @@ class Path
      * @param mixed|null $default
      * @return mixed
      */
-    public function getConfig(string $key = null, mixed $default = null): mixed
+    public function getConfig(?string $key = null, mixed $default = null): mixed
     {
         return $this->name->config($key, $default);
     }
@@ -64,9 +64,12 @@ class Path
             'summary' => $this->name->getSummary(),
             'description' => $this->name->getDescription(),
             'operationId' => $this->name->getOperationId(),
-            'security' => [$this->transformSecurity($this->name->getSecurity())],
             'responses' => $this->processResponses(),
         ];
+
+        if ($security = $this->transformSecurity($this->name->getSecurity())) {
+            $data['security'] = [$security];
+        }
 
         if ($this->name->isDeprecated()) {
             $data['deprecated'] = true;

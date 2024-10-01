@@ -41,7 +41,7 @@ class GenerateCommand extends Command
             $bar = null;
             $count = count($doc['names']);
 
-            $generator = new Generator($doc, $routes, new Documentation());
+            $generator = new Generator($doc, $routes, new Documentation);
             $generator->once('start', function () use (&$bar, $count) {
                 $bar = $this->output->createProgressBar($count);
             });

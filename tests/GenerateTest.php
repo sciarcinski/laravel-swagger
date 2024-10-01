@@ -8,10 +8,7 @@ use Sciarcinski\LaravelSwagger\Generator;
 
 class GenerateTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function valid()
+    public function test_valid()
     {
         $config = [
             'key' => 'api',
@@ -36,7 +33,7 @@ class GenerateTest extends TestCase
         /** @var RouteCollection $routes */
         $routes = app('router')->getRoutes();
 
-        $generator = new Generator($config, $routes, new Documentation());
+        $generator = new Generator($config, $routes, new Documentation);
         $generator->process();
 
         // verify
